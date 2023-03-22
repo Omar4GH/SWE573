@@ -1,13 +1,281 @@
+
+@import url('https://fonts.googleapis.com/css?family=Poppins');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+  height: 100%;
+  font-size: 20px;
+  font-family: "poppins";
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+
+.navbar{
+    
+    background-color: #f0e9e0;
+    height: 100%;
+    text-align: center;
+    
 }
+
+.navTitle{
+    justify-content: space-between;
+    display: inline-block;
+   
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color:#333;
+
+
+    
+}
+.navTitle:hover{
+  background-color: #D1C0A8;
+}
+
+.bar{
+    background-color: #E8DED1;
+    color:#333;
+}
+
+    
+ /*///////////////////////////////////////*/
+
+
+
+      footer {
+      margin-top: 100px;
+      padding: 20px;
+      background-color: #b9e7e7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+   }
+      footer img {
+      height: 50px;
+   }
+      .home .posts {
+      margin-top: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 150px;
+   }
+      .home .posts .post {
+      display: flex;
+      gap: 100px;
+   }
+      .home .posts .post:nth-child(2n + 1) {
+      flex-direction: row-reverse;
+   }
+      .home .posts .post .img {
+      flex: 2;
+      position: relative;
+   }
+      .home .posts .post .img::after {
+      content: "";
+      width: 100%;
+      height: 100%;
+      background-color: #b9e7e7;
+      position: absolute;
+      top: 20px;
+      left: -20px;
+      z-index: -1;
+   }
+      .home .posts .post .img img {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+   }
+      .home .posts .post .content {
+      flex: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+   }
+      .home .posts .post .content h1 {
+      font-size: 48px;
+   }
+      .home .posts .post .content p {
+      font-size: 18px;
+   }
+      .home .posts .post .content button {
+      width: max-content;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      background-color: white;
+      border: 1px solid teal;
+      color: teal;
+   }
+      .home .posts .post .content button:hover {
+      border: 1px solid white;
+      background-color: #b9e7e7;
+      color: black;
+   }
+
+   /*           SINGLE POST           */
+
+      .single {
+      display: flex;
+      gap: 50px;
+      margin-left: 100px;
+      margin-right: 100px;
+   }
+      .single .content {
+      flex: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+   }
+      .single .content img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+   }
+      .single .content .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+   }
+      .single .content .user img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+   }
+      .single .content .user span {
+      font-weight: bold;
+   }
+      .single .content .edit {
+      display: flex;
+      gap: 5px;
+   }
+      .single .content .edit img {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+   }
+      .single .content h1 {
+      font-size: 42px;
+      color: #333;
+   }
+      .single .content p {
+      text-align: justify;
+      line-height: 30px;
+   }
+      .single .menu {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+   }
+      .single .menu h1 {
+      font-size: 20px;
+      color: #555;
+   }
+      .single .menu .post {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+   }
+      .single .menu .post img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+   }
+      .single .menu .post h2 {
+      color: #555;
+   }
+      .single .menu .post button {
+      width: max-content;
+      padding: 7.5px 15px;
+      border: none;
+      cursor: pointer;
+      color: teal;
+      background-color: white;
+      border: 1px solid teal;
+   }
+      .single .menu .post button:hover {
+      border: 1px solid white;
+      background-color: #b9e7e7;
+      color: black;
+   }
+      .add {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+   }
+      .add .content {
+      flex: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+   }
+      .add .content input {
+      padding: 10px;
+      border: 1px solid lightgray;
+   }
+      .add .content .editorContainer {
+      height: 300px;
+      overflow: scroll;
+      border: 1px solid lightgray;
+   }
+      .add .content .editorContainer .editor {
+      height: 100%;
+      border: none;
+   }
+      .add .menu {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+   }
+      .add .menu .item {
+      border: 1px solid lightgray;
+      padding: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #555;
+   }
+      .add .menu .item h1 {
+      font-size: 20px;
+   }
+      .add .menu .item .file {
+      text-decoration: underline;
+      cursor: pointer;
+   }
+      .add .menu .item .buttons {
+      display: flex;
+      justify-content: space-between;
+   }
+      .add .menu .item .buttons :first-child {
+      cursor: pointer;
+      color: teal;
+      background-color: white;
+      border: 1px solid teal;
+      padding: 3px 5px;
+   }
+      .add .menu .item .buttons :last-child {
+      cursor: pointer;
+      color: white;
+      background-color: teal;
+      border: 1px solid teal;
+      padding: 3px 5px;
+   }
+      .add .menu .item .cat {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      color: teal;
+   }
+    
