@@ -39,7 +39,7 @@ function valuetext(value) {
 
     return (
 <div>
-<Navbar/>
+<h1>Post a Story</h1>
 <div className="add">
       <div className="content">
         <input

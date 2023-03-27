@@ -15,8 +15,7 @@ body {
 
 .navbar{
     
-    background-color: #f0e9e0;
-    height: 100%;
+    height: auto;
     text-align: center;
     
 }
@@ -25,10 +24,7 @@ body {
     justify-content: space-between;
     display: inline-block;
    
-    padding-left: 80px;
-    padding-right: 80px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+padding: 15px;
     color:#333;
 
 
@@ -41,6 +37,7 @@ body {
 .bar{
     background-color: #E8DED1;
     color:#333;
+    border-radius: 50px 50px;
 }
 
     
@@ -51,7 +48,7 @@ body {
       footer {
       margin-top: 100px;
       padding: 20px;
-      background-color: #b9e7e7;
+      background-color: #E8DED1;
       display: flex;
       align-items: center;
       justify-content: space-between;

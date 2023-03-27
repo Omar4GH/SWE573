@@ -42,7 +42,7 @@ function Story() {
 
     return (
 <div>
-<Navbar/>
+
 
 <div className="single">
       <div className="content"><br/>        <div className="user">

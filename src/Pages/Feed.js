@@ -10,7 +10,6 @@ function Feed() {
 
     return (
 <div>
-<Navbar/>
 Feed
 
 </div>

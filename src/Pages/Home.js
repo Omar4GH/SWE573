@@ -3,14 +3,14 @@ import Navbar from "../components/Navbar";
 
 
 
-function About() {
+function Home() {
     
 
  
 
     return (
 <div>
-About
+Home
 
 </div>
     );
@@ -18,4 +18,4 @@ About
 
 }
 
-export default About;
+export default Home;
