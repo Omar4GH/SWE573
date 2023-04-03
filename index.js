@@ -4,11 +4,18 @@ import storyRoute from "./routes/stories.js";
 import authRoute from "./routes/auth.js";
 import userRoute from "./routes/users.js";
 import cookieParser from "cookie-parser";
+import cookieSession from 'cookie-session';
+
 const app = express()
 
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
+  }));
+
+  app.use(cookieSession({
+    name: 'session',
+    keys: ['key1', 'key2']
   }));
 
 app.use(express.json())

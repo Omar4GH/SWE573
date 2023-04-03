@@ -1,6 +1,17 @@
 import { db } from "../db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import cookieSession from 'cookie-session';
+import express from 'express';
+
+const authRouter = express.Router();
+
+authRouter.use(cookieSession({
+  name: 'session',
+  keys: ['geomemToken', 'key2']
+}));
+
+
 export const register = (req, res) => {
   //does user exist
   const q = "SELECT * FROM users WHERE email = ? OR username = ?";
@@ -42,13 +53,26 @@ export const login = (req, res) => {
     const token = jwt.sign({ id: data[0].id }, "jwtkey");
     const { password, ...other } = data[0];
 
-    res
-      .cookie("access_token", token, {
+    req.session.geomemToken = token;
+    res.status(200).json(other);
+
+    /*
+    res.cookie("geomemToken", token, {
+      httpOnly: false,
+    }).status(200).json(other);*/
+
+/*
+    res.cookie("geomemToken", token, {
         httpOnly: true,
       })
       .status(200)
-      .json(other);
+      .json(other);*/
   });
 };
 
-export const logout = (req, res) => {};
+export const logout = (req, res) => {
+
+  req.session = null;
+  res.status(200).json("User Logged Out!!");
+
+};
