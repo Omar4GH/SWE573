@@ -37,7 +37,7 @@ const navigate = useNavigate();
       <div className="w-full p-6 m-auto bg-white rounded-md shadow-xl lg:max-w-xl">
         <h1
           className="text-3xl font-semibold text-center uppercase"
-          style={{ color: "#D1345B" }}
+          style={{ color: "#7d7059" }}
         >
           Sign Up
         </h1>
@@ -52,7 +52,7 @@ const navigate = useNavigate();
             <input
               required
               type="text"
-              className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full px-4 py-2 mt-2 text-orange-300 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40"
               name="username"
               onChange={handleChange}
             />
@@ -67,7 +67,7 @@ const navigate = useNavigate();
             <input
               required
               type="text"
-              className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full px-4 py-2 mt-2 text-orange-300 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40"
               name="email"
               onChange={handleChange}
             />
@@ -82,14 +82,14 @@ const navigate = useNavigate();
             <input
               required
               type="password"
-              className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full px-4 py-2 mt-2 text-orange-300 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40"
               name="password"
               onChange={handleChange}
             />
           </div>
 {err && <p>{err}</p>}
           <div className="mt-6">
-            <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform submit-btn rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600">
+            <button className="w-full px-4 py-2 tracking-wide bg-orange-200 text-white transition-colors duration-200 transform submit-btn rounded-md hover:bg-orange-100 focus:outline-none focus:bg-purple-600">
               Register
             </button>
           </div>
