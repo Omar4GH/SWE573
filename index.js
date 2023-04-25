@@ -3,6 +3,7 @@ import cors from "cors";
 import storyRoute from "./routes/stories.js";
 import authRoute from "./routes/auth.js";
 import userRoute from "./routes/users.js";
+import commentsRoute from "./routes/comments.js";
 import cookieParser from "cookie-parser";
 import cookieSession from 'cookie-session';
 
@@ -26,6 +27,8 @@ app.use("/api/story", storyRoute)
 app.use("/api/users", userRoute)
 
 app.use("/api/auth", authRoute)
+
+app.use("/api/comments", commentsRoute)
 
 app.listen(8800,()=>{
     console.log("Connected")
