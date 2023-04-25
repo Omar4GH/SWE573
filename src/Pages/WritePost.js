@@ -15,6 +15,8 @@ import Popover from "@mui/material/Popover";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import  NominatimGeocoder  from 'nominatim-geocoder';
+import MapView from "../components/MapView";
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 
 function WritePost() {
   const { currentUser } = useContext(AuthContext);
@@ -27,10 +29,14 @@ function WritePost() {
   const [title, setTitle] = useState(state?.title || "");
   const [file, setFile] = useState(null);
   const [year, setYear] = useState(state?.year || "");
+  const [imgUrl, setImgUrl] = useState(state?.img || "");
   //const position = "34.4462209063811, 35.83014616188998";
   const [lat, setLat] = useState(); 
   const [lon, setLon] = useState();
   const [address, setAddress] = useState("Pick a Location");
+
+
+    
 
   const navigate = useNavigate();
 
@@ -39,6 +45,27 @@ function WritePost() {
   const [position, setPosition] = useState("51.505, -0.09"); // default position - later will change to User's location by Default
 
 console.log(position);
+
+
+
+  /* BUTTON */
+  const [buttons, setButtons] = useState([]); // State to keep track of buttons
+
+  // Function to add a new button
+  const addNewButton = () => {
+    const newButton = (
+      <>
+    
+      </>
+    );
+    setButtons([...buttons, newButton]);
+  };
+
+  // Event handler for button click
+  const handleButtonClick = () => {
+    console.log("Button clicked!");
+  };
+  ////////////////////////////
 
 
 useEffect(() => {
@@ -66,11 +93,14 @@ useEffect(() => {
         ? await axios.put(`http://localhost:8800/api/story/${state.id}`, {
             title: title,
             content: value,
+            img: imgUrl,
+            year: year,
+            geocode: position,
           })
         : await axios.post(`http://localhost:8800/api/story/`, {
             title: title,
             content: value,
-            img: "https://drscdn.500px.org/photo/1052218373/m%3D900/v2?sig=c89f9d25d4152370f0a8085e06bf3ec0fc8fa19e91cd48404777214868a0bc33",
+            img: imgUrl,
             postdate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
             year: year,
             geocode: position,
@@ -108,7 +138,7 @@ useEffect(() => {
   }
   //////////////////popover////////////////////////////////
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handlepopoverClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -119,7 +149,7 @@ useEffect(() => {
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   /////////////////////////////////////////////////
   return (
@@ -163,49 +193,58 @@ useEffect(() => {
             />
             <label className="file" htmlFor="file">
               Upload Image
-            </label>
+            </label><br/>
+            <span>(temp)*Image URL :</span>
+            <input
+            type="text"
+            placeholder="Image"
+            value={imgUrl}
+            onChange={(e) => setImgUrl(e.target.value)}
+          /><br/>
             <div className="buttons">
               <button disabled>Save as a draft</button>
               <button onClick={handleClick}>Publish</button>
             </div>
           </div>
+
+          <div>
+
+    </div>
+
+
+
           <div className="item">
-            <Button
-              aria-describedby={id}
-              variant="contained"
-              onClick={handlepopoverClick}
-            >
-             {address} 
-            </Button>
-            <Popover
-              id={id}
-              open={open}
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-            >
-              <Typography sx={{ p: 2 }}>
-                {" "}
-                <div>
-                  {" "}{address}
-                  <LocationPicker
-                   // geoURL="https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU"
-                    mapStyle={{
-                     width: '100%', // Set the width of the map container
-                    
-                    }}
-                    pointMode={pointMode}
-                  />
-                </div>{" "}
-              </Typography>
-            </Popover>
+
+          {buttons.map((button) => (
+        <div className="mb-3" key={button.key}>    
+        <Button
+        className="w-full"
+        aria-describedby={id}
+        variant="contained"
+        onClick={handlepopoverClick}
+      >
+        {address}
+      </Button>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <Typography sx={{ p: 2 }}>
+   <MapView/>
+        </Typography>
+      </Popover></div>
+      ))}
+      <button onClick={addNewButton}><AddLocationAltIcon/></button>
 
             <h1>YEAR</h1>
             {year}

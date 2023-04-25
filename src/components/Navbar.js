@@ -2,6 +2,8 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
+import Avatar from "@mui/material/Avatar";
+import { red } from "@mui/material/colors";
 import logo from "../assets/LogoGeoMemoirs.png";
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
@@ -39,10 +41,10 @@ const Navbar = () => {
           {currentUser ? (
             <>
               <Link
-                to={"/"}
+                to={"/profile"}
                 className=" navItem p-2 cursor-pointer float-right mr-7"
               >
-                <div className=" ">{currentUser?.username}</div>
+                <Avatar sx={{ bgcolor: red[500] }} src={currentUser.img} aria-label="avatar"/>
               </Link>
 
               <Link
@@ -52,8 +54,8 @@ const Navbar = () => {
                 <div>Logout</div>
               </Link>
             </>
-          ) : (<div className="absolute float-right navTitlee ">
-            <Link to={"/signin"} className=" navItem p-2 cursor-pointer">
+          ) : (<div className="absolute float-right  ">
+            <Link to={"/signin"} className="  p-2 cursor-pointer">
               <div className="navTitle float-right mr-7">Login</div>
             </Link></div>
           )}

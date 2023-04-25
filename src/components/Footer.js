@@ -8,7 +8,7 @@ const Footer = () => {
       <span>
          {"  "}
         Built by <a className="font-bold text-red-700" href="https://omarghamrawi.net/" target="_blank">Omar Ghamrawi</a> , 
-        a project for SWE-573 , Ms.Software Engineering Boğaziçi University 2023 <br/>
+        a project for SWE-573 , MSc.Software Engineering Boğaziçi University 2023 <br/>
         Using ReactJs and NodeJs
       </span></div></div>
     </footer>
