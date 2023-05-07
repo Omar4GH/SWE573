@@ -13,7 +13,12 @@ app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
   }));
-
+/*
+  app.use(cors({
+    origin: 'http://localhost:10927',
+    credentials: true
+  }));
+*/
   app.use(cookieSession({
     name: 'session',
     keys: ['key1', 'key2']
