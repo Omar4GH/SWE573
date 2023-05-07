@@ -1,32 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import moment from "moment";
 
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 import CardMedia from "@mui/material/CardMedia";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
 import { red } from "@mui/material/colors";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
-
 import Box from "@mui/material/Box";
+import Slider from '@mui/material/Slider';
 import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 
 import "leaflet/dist/leaflet.css";
 import { Icon, divIcon, point } from "leaflet";
@@ -34,22 +28,59 @@ import axios from "axios";
 
 function Feed() {
   const [stories, setStories] = useState([]);
-  const yearFilter = useLocation().search;
-  console.log(yearFilter);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8800/api/story/${yearFilter}`
-        );
-        setStories(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [yearFilter]);
+  const [users, setUsers] = useState([]);
+  //const yearFilter = useLocation().search;
+  const [yearFilter, setYearFilter] = useState("");
+  const [titleFilter, setTitleFilter] = useState("");
+  const [userFilter, setUserFilter] = useState("");
+  const [usernameFilter, setUsernameFilter] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const handleTitleChange = (e) => {
+    setTitleFilter(e.target.value);
+  };
+  const handleUserChange = (e, value) => {
+    if (value) {
+      setSelectedUser(value);
+      setUserFilter(value.id);
+      setUsernameFilter(value.username);
+    } else {
+      setSelectedUser(null);
+      setUserFilter("");
+      setUsernameFilter("");
+    }
+  };
+  const handleUsernameChange = (e) => {
+    setUsernameFilter(e.target.value);
+  };
 
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8800/api/story/?year=${yearFilter}&title=${titleFilter}&userid=${userFilter}`
+      );
+      setStories(res.data);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8800/api/users/?name=${usernameFilter}`
+      );
+      setUsers(res.data);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchUsers();
+  }, [yearFilter, titleFilter, userFilter, usernameFilter]);
+  
   //Side Menu
   const [state, setState] = React.useState({
     top: false,
@@ -73,19 +104,9 @@ function Feed() {
       role="presentation"
       // onClick={toggleDrawer(anchor, false)}
       onKeyDown={toggleDrawer(anchor, false)}
-    >
-      <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+    > 
+ <div className="m-5">Filter</div>
+
       <Divider />
       <List>
         <Link to="/feed/?year=1985">
@@ -95,32 +116,97 @@ function Feed() {
           <span>clear</span>
         </Link>
       </List>
+      <div className="bg-gray-200 p-4">
+      <h3 className="text-lg font-semibold mb-4">Filter by Year</h3>
+      
+      <Typography id="year-range-slider" gutterBottom>
+        Year Range: {yearRange[0]} - {yearRange[1]}
+      </Typography>
+      
+      <Slider
+        value={yearRange}
+        onChange={handleYearRangeChange}
+        min={1940}
+        max={2023}
+        step={1}
+        valueLabelDisplay="auto"
+        aria-labelledby="year-range-slider"
+      />
+    </div>
     </Box>
+    
   );
   //
+  const [yearRange, setYearRange] = useState([2000, 2023]); // Initial year range
 
+  // Handler for year range change
+  const handleYearRangeChange = (event, newYearRange) => {
+    setYearRange(newYearRange);
+  };
   const position = "34.4462209063811, 35.83014616188998";
-  // const arr = position.split(",").map(parseFloat);
-  // console.log(arr);
+  
 
   const customIcon = new Icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/819/819814.png",
-    // iconUrl: require(PlaceIcon),
+    
     iconSize: [38, 38],
   });
-  /*
-  const createCustomClusterIcon = (cluster) =>{
-    return new divIcon({
-      html:`<div class="cluster-icon">${cluster.getChildCount()}</div>`,
-      iconSize: point(33,33, true)
-  });
-  };*/
+
 
   return (
     <div className="home">
       <h1 className="mt-7 mb-7 text-center text-5xl">
         Check out Stories from around the World !{" "}
       </h1>
+      <div className="flex">
+      <input
+        type="text"
+        placeholder="Search by title"
+        value={titleFilter}
+        onChange={handleTitleChange}
+      />
+ <Autocomplete className="w-52 ml-5 bg-white"
+    options={users}
+    getOptionLabel={(users) => users.username || ""}
+    renderOption={(user) => (
+      <div className="user">
+        <Avatar src={user.img} alt={user.username} />
+        <span>{user.username}</span>
+      </div>
+    )}
+    value={users.find((option) => option.id === userFilter)}
+    onChange={handleUserChange}
+    onInputChange={handleUsernameChange}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Search by User"
+        variant="outlined"
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <React.Fragment>
+            
+              {params.InputProps.endAdornment}
+            </React.Fragment>
+          ),
+        }}
+      />
+    )}
+  />
+      {/* 
+            <input
+        type="text"
+        placeholder="Search by User"
+        value={usernameFilter}
+        onChange={handleUsernameChange}
+      />
+      <select onChange={handleUserChange}>
+        <option value="">Select a user</option>
+        {users.map(user => <option key={user.id} value={user.id}>{user.username}</option>)}
+      </select>
+*/}
+    </div>
       <div className="float-left ">
         {["Search/Filter"].map((anchor) => (
           <React.Fragment key={anchor}>
@@ -179,19 +265,7 @@ function Feed() {
       <div className="posts flex flex-wrap">
         {stories.map(
           (
-            story /*
-          <div className="post" key={story.id}>
-            <div className="img">
-              <img src={story.img} alt="" />
-            </div>
-            <div className="content">
-              <Link className="link" to={`/story/${story.id}`}>
-                <h1>{story.title}</h1>
-              </Link>
-              <button>Read More</button>
-            </div>
-          </div>
-      */
+            story 
           ) => (
             <Card
               sx={{ maxWidth: 345 }}
