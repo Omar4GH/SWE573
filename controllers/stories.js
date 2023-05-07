@@ -11,11 +11,14 @@ authRouter.use(cookieSession({
 }));
 
 export const getStories = (req, res) => {
-  const q = req.query.year
-    ? "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode` FROM users u JOIN stories s ON u.id = s.uid WHERE year=?"
-    : "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode` FROM users u JOIN stories s ON u.id = s.uid";
-  db.query(q, [req.query.year], (err, data) => {
-    if (err) return err.status(500).send(err);
+  const q = req.query.userid 
+    ? "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, s.uid, `year`, `postdate`, `geocode` FROM users u JOIN stories s ON u.id = s.uid WHERE s.uid = ?"
+    : req.query.year || req.query.title 
+      ? "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, s.uid, `year`, `postdate`, `geocode` FROM users u JOIN stories s ON u.id = s.uid WHERE year=? OR title LIKE ? "
+      : "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode` FROM users u JOIN stories s ON u.id = s.uid";
+
+  db.query(q, [req.query.userid || req.query.year, `%${req.query.title}%`], (err, data) => {
+    if (err) return res.status(500).send(err);
 
     return res.status(200).json(data);
   });
@@ -23,7 +26,7 @@ export const getStories = (req, res) => {
 
 export const getStory = (req, res) => {
   const q =
-    "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode` FROM users u JOIN stories s ON u.id = s.uid WHERE s.id = ? ";
+    "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode`, `uid` FROM users u JOIN stories s ON u.id = s.uid WHERE s.id = ? ";
   db.query(q, [req.params.id], (err, data) => {
     if (err) return res.status(500).json(err);
 
