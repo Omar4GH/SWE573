@@ -15,7 +15,8 @@ body {
 
 
 .navbar{
-    
+    background-color: #E8DED1;
+    border-radius: 10px 10px;
     height: auto;
     text-align: center;
     
@@ -354,3 +355,4 @@ ol.comments-list>li {
  }
  
 /*////////////////////////////////////*/
+

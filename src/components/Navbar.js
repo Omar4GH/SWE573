@@ -5,6 +5,8 @@ import { AuthContext } from "../context/authContext";
 import Avatar from "@mui/material/Avatar";
 import { red } from "@mui/material/colors";
 import logo from "../assets/LogoGeoMemoirs.png";
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
 
@@ -18,18 +20,13 @@ const Navbar = () => {
           <div className="navTitle">Feed</div>
         </Link>
 
-        <Link to={"/profile"} className="p-2 cursor-pointer">
-          <div className="navTitle">Profile</div>
-        </Link>
+     
       </div>
       <Link to={"/"} className="cursor-pointer">
         <img className="navBarLogo" src={logo} />
       </Link>
       <div className="bar">
-        <Link to={"/story"} className="p-2 cursor-pointer">
-          <div className="navTitle">Story</div>
-        </Link>
-
+  
         <Link to={"/about"} className="p-2 cursor-pointer">
           <div className="navTitle">About</div>
         </Link>
@@ -37,27 +34,35 @@ const Navbar = () => {
         <Link to={"/writepost"} className="p-2 cursor-pointer">
           <div className="navTitle">Write Post</div>
         </Link></div>
-        <div className=" float-right mr-7 inline-block absolute" >
+        <div className=" mt-4 mr-7 inline-block align-middle absolute " >
           {currentUser ? (
             <>
               <Link
                 to={"/profile"}
-                className=" navItem p-2 cursor-pointer float-right mr-7"
+                className="  "
               >
-                <Avatar sx={{ bgcolor: red[500] }} src={currentUser.img} aria-label="avatar"/>
+                <Avatar className="shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl" sx={{width: 96, height:96, bgcolor: red[500] }} src={currentUser.img} aria-label="avatar"/>
               </Link>
-
               <Link
+                to={"/"}
                 onClick={logout}
-                className="navItem  p-2 cursor-pointer float-right mr-7"
               >
-                <div>Logout</div>
-              </Link>
+                <LogoutIcon/></Link>
+             
             </>
-          ) : (<div className="absolute float-right  ">
-            <Link to={"/signin"} className="  p-2 cursor-pointer">
-              <div className="navTitle float-right mr-7">Login</div>
-            </Link></div>
+          ) : (       <>
+            <Link
+              to={"/signin"}
+              className="  "
+            >
+              <Avatar className="shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl" sx={{width: 96, height:96, bgcolor: red[500] }}  aria-label="avatar"/>
+            </Link>
+            <Link
+              to={"/signin"}
+            >
+              <LoginIcon/></Link>
+           
+          </>
           )}
         </div>
       

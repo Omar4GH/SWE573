@@ -116,9 +116,10 @@ $lightGreen: #b9e7e7;
         gap: 30px;
 
         img {
-          width: 100%;
-          height: 400px;
-          object-fit: cover;
+        
+          width: 900px;
+          height: 500px;
+          object-fit:fill;
         }
 
         .user {
@@ -233,7 +234,10 @@ $lightGreen: #b9e7e7;
           }
         }
       }
-
+      .editor {
+        height: 700px;
+        border: none;
+      }
       .menu {
         flex: 2;
         display: flex;

@@ -15,7 +15,7 @@ const Map = ({ onCoordinatesChange }) => {
 
     const handleClick = (e) => {
       const { lat, lng } = e.latlng;
-      console.log("Selected location:", lat, lng);
+      console.log(lat, lng);
 
       // Remove the previously added marker from the map
       if (marker) {

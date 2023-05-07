@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import logo from "../assets/LogoGeoMemoirs.png";
 
 function Register() {
 
@@ -34,6 +35,7 @@ const navigate = useNavigate();
   return (
     <div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
       <div className="bg-image w-full h-full"></div>
+      <div className="justify-center text-center flex"><img className="w-72 h-72" src={logo}/></div>
       <div className="w-full p-6 m-auto bg-white rounded-md shadow-xl lg:max-w-xl">
         <h1
           className="text-3xl font-semibold text-center uppercase"

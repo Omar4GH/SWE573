@@ -25,6 +25,7 @@ function Story() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isClick, setClick] = useState(false);
+  const [trigger, setTtrigger] = useState(false);
 
   const geoConvert = new NominatimGeocoder();
 
@@ -33,9 +34,6 @@ function Story() {
   const [address, setAddress] = useState("");
   const storyId = location.pathname.split("/")[2];
   const { currentUser } = useContext(AuthContext);
-  const ngr = [34.4462209063811, 35.83014616188998];
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +67,7 @@ function Story() {
       }
     };
     fetchData();
-  }, []);
+  }, [trigger]);
 
   useEffect(() => {
     if (lat && lon) {
@@ -104,25 +102,26 @@ function Story() {
     iconSize: [38, 38],
   });
 
-
   const postCommentClick = async (e) => {
     e.preventDefault();
+    setTtrigger(!trigger);
     // const imgUrl = await upload();
 
     try {
-        await axios.post(`http://localhost:8800/api/comments/`, {
-            date_posted: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-            comment: comment,
-            sid: story.id,
-            uid: currentUser.id,
-          })  .then((response) => {
-            console.log(response.data);
-          });
+      await axios
+        .post(`http://localhost:8800/api/comments/`, {
+          date_posted: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+          comment: comment,
+          sid: story.id,
+          uid: currentUser.id,
+        })
+        .then((response) => {
+          console.log(response.data);
+        });
     } catch (err) {
       console.log(err);
     }
   };
-
 
   return (
     <div>
@@ -130,7 +129,7 @@ function Story() {
         <div className="content">
           <br />{" "}
           <div className="user">
-            <img src={story.userImg} alt="" />
+            <img onClick={() => navigate(`/userprofile/${story.uid}`)} src={story.userImg} alt="" />
 
             <div className="info">
               <span>{story.username}</span>
@@ -148,7 +147,6 @@ function Story() {
             <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
               {address} &nbsp;&nbsp; {story.year}
             </div>
-            
           </div>
           <div className="flex  justify-center ">
             {lat != null && lon != null && (
@@ -168,64 +166,87 @@ function Story() {
             )}
           </div>
           <h1>{story.title}</h1>
-          <img src={story.img} alt="" />
-          <p>{story.content}</p>{" "}
+          <div className="text-center flex justify-center">
+          <img src={story.img} alt="" /></div>
+          <p dangerouslySetInnerHTML={{__html: story.content}}></p>{" "}
         </div>
-        
       </div>
       <div className=" mt-7 mb-7 w-full h-1 bg-orange-100"></div>
-      <div className=""><div className="float-right right-96 text-right text-base m-0 absolute flex self-center text-gray-700">0<Heart isClick={isClick} onClick={() => setClick(!isClick)} /></div>
-        <ol className="comments-list ">      <label
-              for="comment"
-              className="block text-sm font-semibold text-gray-800"
-            >
-              Comment
-            </label>
+      <div className="">
+        <div className="float-right right-96 text-right text-base m-0 absolute flex self-center text-gray-700">
+          0<Heart isClick={isClick} onClick={() => setClick(!isClick)} />
+        </div>
+        <ol className="comments-list ">
+          {" "}
+          <label
+            for="comment"
+            className="block text-sm font-semibold text-gray-800"
+          >
+            Comment
+          </label>
           <div className="mb-2 flex">
-      
-            <textarea
-              required
-              name="comment"
-              type="text"
-              className="block w-2/4 px-4 py-2 mt-2 text-orange-300 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40"
-              onChange={(event) => setComment(event.target.value)}
-            />
-                        <button className=" px-4 py-2 h-fit m-5 self-center text-sm tracking-wide bg-orange-200 text-zinc-900 transition-colors duration-200 transform rounded-md hover:bg-orange-100 focus:outline-none focus:bg-orange-100 " onClick={postCommentClick}>
-              Post Comment
-            </button>
+            {currentUser ? (
+              <>
+                <textarea
+                  required
+                  name="comment"
+                  type="text"
+                  className="block w-2/4 px-4 py-2 mt-2 text-orange-300 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40"
+                  onChange={(event) => setComment(event.target.value)}
+                />
+                <button
+                  className=" px-4 py-2 h-fit m-5 self-center text-sm tracking-wide bg-orange-200 text-zinc-900 transition-colors duration-200 transform rounded-md hover:bg-orange-100 focus:outline-none focus:bg-orange-100 "
+                  onClick={postCommentClick}
+                >
+                  Post Comment
+                </button>
+              </>
+            ) : (
+              <>
+                {" "}
+                <textarea
+                  required
+                  disabled
+                  name="comment"
+                  type="text"
+                  className="cursor-not-allowed block w-2/4 px-4 py-2 mt-2 text-orange-300 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40"
+                  onChange={(event) => setComment(event.target.value)}
+                />
+                <button
+                  className=" px-4 py-2 h-fit m-5 self-center text-sm tracking-wide bg-orange-200 text-zinc-900 transition-colors duration-200 transform rounded-md hover:bg-orange-100 focus:outline-none focus:bg-orange-100 "
+                  onClick={() => navigate("/signin")}
+                >
+                  Signin to Comment
+                </button>
+              </>
+            )}
           </div>
           {Array.isArray(comments) ? (
             comments.map((comment, key) => {
               return (
                 <li className="w-2/4" key={key}>
-                <div className=" ">
-                  <div className="w-full">
-                    <CardHeader
-                      avatar={
-                        <Avatar
-                          sx={{ bgcolor: red[500] }}
-                          src={comment.userImg}
-                          aria-label="avatar"
-                        />
-                      }
-                      title={comment.username}
-                      subheader={moment(comment.date_posted).fromNow()}
-                    />
+                  <div className=" ">
+                    <div className="w-full">
+                      <CardHeader
+                        avatar={
+                          <Avatar
+                            sx={{ bgcolor: red[500] }}
+                            src={comment.userImg}
+                            aria-label="avatar"
+                          />
+                        }
+                        title={comment.username}
+                        subheader={moment(comment.date_posted).fromNow()}
+                      />
+                    </div>
+                    <div className="w-full  text-lg ">{comment.comment}</div>
                   </div>
-                  <div className="w-full  text-lg ">
-                 {comment.comment} 
-                  </div>
-                </div>
-              </li>
+                </li>
               );
             })
           ) : (
-            <>
-              
-            </>
+            <></>
           )}
-          
-          
         </ol>
       </div>
     </div>
