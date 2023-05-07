@@ -16,6 +16,7 @@ import Story from "./Pages/Story";
 import WritePost from "./Pages/WritePost";
 
 import "./index.css";
+import UserProfile from "./Pages/UserProfile";
 
 const Layout = () => {
   return (
@@ -39,6 +40,9 @@ const router = createBrowserRouter([
       {
         path: "/story/:id",
         element: <Story />,
+      },  {
+        path: "/userprofile/:id",
+        element: <UserProfile />,
       },
       {
         path: "/writepost",
