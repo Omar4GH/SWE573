@@ -32,3 +32,16 @@ export const postComment = (req, res) => {
  // });
 };
 
+export const deleteComment = (req, res) => {
+
+     const commentid = req.params.id;
+     const q = "DELETE FROM comments WHERE `id` = ?";
+ 
+     db.query(q, [commentid], (err, data) => {
+       if (err)
+         return res.status(403).json("Nope ");
+ 
+       return res.json("Comment Deleted ! ");
+     });
+ };
+ 
