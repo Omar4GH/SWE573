@@ -20,11 +20,12 @@ import { Icon, divIcon, point } from "leaflet";
 function Story() {
   const [story, setStory] = useState({});
   const [comments, setComments] = useState({});
+
   const [map, setmap] = useState(false);
   const [comment, setComment] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-  const [isClick, setClick] = useState(false);
+
   const [trigger, setTtrigger] = useState(false);
 
   const geoConvert = new NominatimGeocoder();
@@ -67,6 +68,7 @@ function Story() {
       }
     };
     fetchData();
+    getLikes();
   }, [trigger]);
 
   useEffect(() => {
@@ -101,6 +103,7 @@ function Story() {
     // iconUrl: require(PlaceIcon),
     iconSize: [38, 38],
   });
+  ////////////////////////////////  COMMENT   /////////////////////////////////////////////////
 
   const postCommentClick = async (e) => {
     e.preventDefault();
@@ -123,19 +126,115 @@ function Story() {
     }
   };
 
+  const deleteComment = async (id) => {
+    setTtrigger(!trigger);
+
+    try {
+      await axios
+        .delete(`http://localhost:8800/api/comments/${id}`)
+        .then((response) => {
+          console.log(response);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  /////////////////////////////////////////      Like       ////////////////////////////////////////////
+  const [isLiked, setIsLiked] = useState(false);
+  const [isClick, setIsClick] = useState(false);
+  const [allLikes, setAllLikes] = useState({});
+  const [likeId, setLikeId] = useState("");
+  const [likes, setLikes] = useState({});
+
+  const postLike = async (e) => {
+    e.preventDefault();
+    setTtrigger(!trigger);
+
+    if (isClick) {
+      try {
+        await axios
+          .delete(`http://localhost:8800/api/likes/${likeId}`)
+          .then((response) => {
+            console.log("deleted Comment");
+            setIsLiked(false);
+            setIsClick(false);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      try {
+        await axios
+          .post(`http://localhost:8800/api/likes/`, {
+            user_id: currentUser.id,
+            story_id: story.id,
+          })
+          .then((response) => {
+            console.log(response.data);
+            setIsLiked(true);
+            setIsClick(true);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const getLikes = async () => {
+    try {
+      const res = await axios.get("http://localhost:8800/api/likes/");
+      setAllLikes(res.data);
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (Array.isArray(allLikes)) {
+      const filteredLikes = allLikes.filter(
+        (like) => like.story_id === story.id
+      );
+      setLikes(filteredLikes);
+
+      if (currentUser) {
+        const userLiked = filteredLikes.some(
+          (like) => like.user_id === currentUser.id
+        );
+        if (userLiked) {
+          setIsClick(true);
+          console.log("liked by user");
+          const userlike = filteredLikes.filter(
+            (like) => like.user_id === currentUser.id
+          );
+          setLikeId(userlike[0].id);
+          console.log(userlike[0].id);
+        }
+      }
+    }
+  }, [allLikes, trigger]);
+
+  ////////////////////////////////////////////////////////////////
+
   return (
     <div>
       <div className="single">
         <div className="content">
           <br />{" "}
           <div className="user">
-            <img onClick={() => navigate(`/userprofile/${story.uid}`)} src={story.userImg} alt="" />
+            <Avatar
+              className="cursor-pointer"
+              onClick={() => navigate(`/userprofile/${story.uid}`)}
+              sx={{ width: 66, height: 66, bgcolor: red[500] }}
+              src={story.userImg}
+              aria-label="avatar"
+            />
 
             <div className="info">
               <span>{story.username}</span>
               <p>Posted {moment(story.postdate).fromNow()}</p>
             </div>
-            {currentUser && currentUser.username === story.username && (
+            {currentUser && currentUser.id === story.uid && (
               <div className="edit">
                 <Link to={`/writepost?edit=2`} state={story}>
                   <Edit />
@@ -167,15 +266,22 @@ function Story() {
           </div>
           <h1>{story.title}</h1>
           <div className="text-center flex justify-center">
-          <img src={story.img} alt="" /></div>
-          <p dangerouslySetInnerHTML={{__html: story.content}}></p>{" "}
+            <img src={story.img} alt="" />
+          </div>
+          <p dangerouslySetInnerHTML={{ __html: story.content }}></p>{" "}
         </div>
       </div>
       <div className=" mt-7 mb-7 w-full h-1 bg-orange-100"></div>
       <div className="">
-        <div className="float-right right-96 text-right text-base m-0 absolute flex self-center text-gray-700">
-          0<Heart isClick={isClick} onClick={() => setClick(!isClick)} />
-        </div>
+
+      <div className="float-right right-96 text-right align-center text-base m-0 absolute flex self-center text-gray-700">
+  <div className="relative">
+    <Heart isClick={isClick} onClick={postLike} />
+    <span className="absolute top-1/2 transform -translate-y-1/2 left-full ml-2">{likes.length}</span>
+  </div>
+</div>
+
+
         <ol className="comments-list ">
           {" "}
           <label
@@ -225,6 +331,17 @@ function Story() {
             comments.map((comment, key) => {
               return (
                 <li className="w-2/4" key={key}>
+                  {currentUser &&
+                    (currentUser.id === story.uid ||
+                      comment.uid === currentUser.id) && (
+                      <div className="edit absolute">
+                        <Delete
+                          className="float-right absolute cursor-pointer"
+                          onClick={() => deleteComment(comment.id)}
+                        />
+                      </div>
+                    )}
+
                   <div className=" ">
                     <div className="w-full">
                       <CardHeader
