@@ -4,6 +4,7 @@ import storyRoute from "./routes/stories.js";
 import authRoute from "./routes/auth.js";
 import userRoute from "./routes/users.js";
 import commentsRoute from "./routes/comments.js";
+import likesRoute from "./routes/likes.js";
 import cookieParser from "cookie-parser";
 import cookieSession from 'cookie-session';
 
@@ -34,6 +35,8 @@ app.use("/api/users", userRoute)
 app.use("/api/auth", authRoute)
 
 app.use("/api/comments", commentsRoute)
+
+app.use("/api/likes", likesRoute)
 
 app.listen(8800,()=>{
     console.log("Connected")
