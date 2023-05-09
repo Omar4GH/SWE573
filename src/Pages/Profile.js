@@ -148,7 +148,7 @@ function Profile() {
             )}
             <div className="flex">
               <img
-                className="w-60 h-48 float-left object-cover"
+                className="w-60 h-48 float-left object-cover shadow-2xl"
                 src={userInfo.img}
               />
               &nbsp;&nbsp;&nbsp;
@@ -205,9 +205,9 @@ function Profile() {
       
       (
         <>
-          <div className=" pb-28 h-full bg-orange-50">
+          <div className=" pb-28 h-full mt-2 bg-orange-50 border rounded-lg ">
           
-            <div className="self-center mt-5 mx-auto text-center bg-white w-fit items-center justify-center flex">
+            <div className="self-center mt-5 mx-auto text-center bg-white  w-fit items-center justify-center flex border rounded-lg p-3">
               <div className="mx-5">
                 <div className="listTitles">Stories</div>
                 <div className="details">{Object.keys(stories).length}</div>
@@ -267,9 +267,9 @@ function Profile() {
             ) : (
               <></>
             )}
-            <div className="flex">
+            <div className="flex ">
               <img
-                className="w-60 h-48 float-left object-cover"
+                className="w-60 h-48 float-left object-cover shadow-2xl"
                 src={userInfo.img}
               />
               &nbsp;&nbsp;&nbsp;

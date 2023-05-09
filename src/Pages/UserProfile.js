@@ -84,8 +84,8 @@ function UserProfile() {
     <div>
 
 
-      <div className="mb-28 h-full">
-      <div className="self-center mt-5 mx-auto text-center bg-white w-fit items-center justify-center flex">
+      <div className=" h-full mt-2 border rounded-lg pb-28">
+      <div className="self-center mt-5 mx-auto text-center bg-white w-fit items-center justify-center flex border rounded-lg p-3">
               <div className="mx-5">
                 <div className="listTitles">Stories</div>
                 <div className="details">{Object.keys(stories).length}</div>
@@ -140,7 +140,7 @@ function UserProfile() {
         )}
         <div className="flex">
           <img
-            className="w-60 h-48 float-left object-cover"
+            className="w-60 h-48 float-left object-cover shadow-2xl"
             src={user.img}
           />
           &nbsp;&nbsp;&nbsp;
