@@ -152,6 +152,12 @@ function Feed() {
     iconSize: [38, 38],
   });
 
+//////////////
+const handleCopy = (storyid) => {
+    const url = `http://localhost:3000/story/${storyid}`;
+    navigator.clipboard.writeText(url);
+  };
+
 
   return (
     <div className="home">
@@ -168,12 +174,7 @@ function Feed() {
  <Autocomplete className="w-52 ml-5 bg-white"
     options={users}
     getOptionLabel={(users) => users.username || ""}
-    renderOption={(user) => (
-      <div className="user">
-        <Avatar src={user.img} alt={user.username} />
-        <span>{user.username}</span>
-      </div>
-    )}
+
     value={users.find((option) => option.id === userFilter)}
     onChange={handleUserChange}
     onInputChange={handleUsernameChange}
@@ -282,7 +283,7 @@ function Feed() {
                 height="194"
                 image={story.img}
                 alt="Paella dish"
-              />
+              /></Link>
               <CardHeader
                 avatar={
                   <Avatar sx={{ bgcolor: red[500] }} src={story.userImg} aria-label="avatar"/>
@@ -290,12 +291,12 @@ function Feed() {
                 }
                 action={
                   <IconButton aria-label="share">
-                    <ShareIcon />
+                    <ShareIcon onClick={() => handleCopy(story.id)} />
                   </IconButton>
                 }
                 title={story.username}
                 subheader={moment(story.postdate).fromNow()}
-              /></Link>
+              />
             </Card>
           )
         )}
