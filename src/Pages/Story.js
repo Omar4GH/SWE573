@@ -13,7 +13,7 @@ import Navbar from "../components/Navbar";
 import NominatimGeocoder from "nominatim-geocoder";
 import { AuthContext } from "../context/authContext";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-
+import { Chip } from "@mui/material";
 import CardHeader from "@mui/material/CardHeader";
 import { Icon, divIcon, point } from "leaflet";
 
@@ -30,8 +30,15 @@ function Story() {
 
   const geoConvert = new NominatimGeocoder();
 
+  const [isLiked, setIsLiked] = useState(false);
+  const [isClick, setIsClick] = useState(false);
+  const [allLikes, setAllLikes] = useState({});
+  const [likeId, setLikeId] = useState("");
+  const [likes, setLikes] = useState({});
+
   const [lat, setLat] = useState();
   const [lon, setLon] = useState();
+  const [tags, setTags] = useState({});
   const [address, setAddress] = useState("");
   const storyId = location.pathname.split("/")[2];
   const { currentUser } = useContext(AuthContext);
@@ -43,7 +50,8 @@ function Story() {
           `http://localhost:8800/api/story/${storyId}`
         );
         setStory(res.data);
-        // console.log(res.data);
+        setTags(res.data.tags.split(","));
+        console.log(res.data.tags);
         // setPosition(res.data.geocode);
         const [latStr, lonStr] = res.data.geocode.split(",");
         setLat(parseFloat(latStr.trim()));
@@ -53,7 +61,7 @@ function Story() {
       }
     };
     fetchData();
-  }, [storyId]);
+  }, [storyId, isClick]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,11 +148,7 @@ function Story() {
     }
   };
   /////////////////////////////////////////      Like       ////////////////////////////////////////////
-  const [isLiked, setIsLiked] = useState(false);
-  const [isClick, setIsClick] = useState(false);
-  const [allLikes, setAllLikes] = useState({});
-  const [likeId, setLikeId] = useState("");
-  const [likes, setLikes] = useState({});
+
 
   const postLike = async (e) => {
     e.preventDefault();
@@ -153,7 +157,7 @@ function Story() {
     if (isClick) {
       try {
         await axios
-          .delete(`http://localhost:8800/api/likes/${likeId}`)
+          .delete(`http://localhost:8800/api/likes/${likeId}/${storyId}`)
           .then((response) => {
             console.log("deleted Comment");
             setIsLiked(false);
@@ -265,22 +269,31 @@ function Story() {
             )}
           </div>
           <h1>{story.title}</h1>
+          <div>
+            {Array.isArray(tags) && tags.length > 0 ? (
+              JSON.parse(tags).map((tag) => (
+                <Chip className="mx-1" key={tag} label={tag} />
+              ))
+            ) : (
+              <></>
+            )}
+          </div>
           <div className="text-center flex justify-center">
-            <img src={story.img} alt="" />
+            <img className="shadow-lg" src={story.img} alt="" />
           </div>
           <p dangerouslySetInnerHTML={{ __html: story.content }}></p>{" "}
         </div>
       </div>
       <div className=" mt-7 mb-7 w-full h-1 bg-orange-100"></div>
       <div className="">
-
-      <div className="float-right right-96 text-right align-center text-base m-0 absolute flex self-center text-gray-700">
-  <div className="relative">
-    <Heart isClick={isClick} onClick={postLike} />
-    <span className="absolute top-1/2 transform -translate-y-1/2 left-full ml-2">{likes.length}</span>
-  </div>
-</div>
-
+        <div className="float-right right-96 text-right align-center text-base m-0 absolute flex self-center text-gray-700">
+          <div className="relative">
+            <Heart isClick={isClick} onClick={postLike} />
+            <span className="absolute top-1/2 transform -translate-y-1/2 left-full ml-2">
+              {story.likes}
+            </span>
+          </div>
+        </div>
 
         <ol className="comments-list ">
           {" "}
