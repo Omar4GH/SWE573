@@ -9,24 +9,21 @@ import "../scss/style.scss";
 import Navbar from "../components/Navbar";
 import NominatimGeocoder from "nominatim-geocoder";
 import { AuthContext } from "../context/authContext";
-
+import DoneIcon from '@mui/icons-material/Done';
 import { Icon, divIcon, point } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 function Profile() {
   const { currentUser } = useContext(AuthContext);
-
+  const [trigger, setTrigger] = useState(false);
   const [stories, setStories] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [userInfo, setUserInfo] = useState("");
-
-  const [bio, setBio] = useState("");
 
   const geoConvert = new NominatimGeocoder();
   const navigate = useNavigate();
   const [lat, setLat] = useState();
   const [lon, setLon] = useState();
-  const [address, setAddress] = useState("");
   //setStories(res.data);
   useEffect(() => {
     const fetchData = async () => {
@@ -45,7 +42,7 @@ function Profile() {
     };
     fetchData();
     getUser();
-  }, []);
+  }, [trigger]);
 
   const getUser = async () => {
     try {
@@ -64,13 +61,10 @@ function Profile() {
     setEditMode(!editMode);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      // await axios.delete(`http://localhost:8800/api/story/${id}`);
-      navigate("/");
-    } catch (err) {
-      console.log(err);
-    }
+  const deleteStory = (id) => {
+    axios.delete(`http://localhost:8800/api/story/${id}`).then((response) => {
+      setTrigger(!trigger);
+    });
   };
 
   const position = "34.4462209063811, 35.83014616188998";
@@ -81,12 +75,54 @@ function Profile() {
     iconSize: [38, 38],
   });
 
+  const [countries, setCountries] = useState([]);
+
+  useEffect(() => {
+    fetch("https://restcountries.com/v2/all")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountries(data.map((country) => country.name));
+      });
+  }, []);
+
+  const handleChange = (event) => {
+    setCountry(event.target.value);
+  };
+
+  //////////////////////  UPDATE PROFILE  ////////////////////
+  const [bio, setBio] = useState("");
+  const [country, setCountry] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [profileImg, setProfileImg] = useState("");
+  console.log(profileImg);
+  const updateProfile = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios
+        .put(`http://localhost:8800/api/users/${currentUser.id}`, {
+          bio: bio || userInfo.bio,
+          birthdate: birthdate || new Date(userInfo.birthdate).toISOString().slice(0, 10),
+          img: profileImg || userInfo.img,
+          country: country || userInfo.country,
+        })
+        .then((response) => {
+          setTrigger(!trigger);
+          switchEditMode();
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  ////////////////////////////////////////////////////////
+
   return (
     <div>
       {editMode ? (
         <>
           <div className="mb-28 h-full">
-          <div className="self-center mt-5 mx-auto text-center bg-white w-fit items-center justify-center flex">
+            <div className="self-center mt-5 mx-auto text-center bg-white w-fit items-center justify-center flex">
               <div className="mx-5">
                 <div className="listTitles">Stories</div>
                 <div className="details">{Object.keys(stories).length}</div>
@@ -100,14 +136,15 @@ function Profile() {
                 <div className="details">{userInfo.followers}</div>
               </div>
               <div
-                className="float-right right-96 text-right text-xs absolute m-0 cursor-pointer text-gray-700"
-                onClick={switchEditMode}
+                className="float-right right-96 text-right text-xs absolute m-0  text-gray-700"
+                
               >
-                <Edit />
-                Done
+                <Edit fontSize="medium" className="cursor-pointer hover:text-blue-800" onClick={switchEditMode}/>
+                Back
+                <DoneIcon fontSize="medium" className="cursor-pointer hover:text-green-600" onClick={updateProfile}/>Save Changes
               </div>
             </div>
-            {Array.isArray(stories) ? (
+            { Array.isArray(stories) ? (
               <div className="">
                 <MapContainer
                   className="leaflet-container2"
@@ -145,39 +182,71 @@ function Profile() {
               </div>
             ) : (
               <></>
-            )}
-            <div className="flex">
-              <img
-                className="w-60 h-48 float-left object-cover shadow-2xl"
-                src={userInfo.img}
-              />
-              &nbsp;&nbsp;&nbsp;
-              <div>
-                <p className="font-bold"> {userInfo.username}</p>
-                <br />
-                <textarea
-                  className="sidebar-subpage-input h-36 w-auto"
-                  type="text"
-                  placeholder="Bio..."
-                  name="plan"
-                  required
-                  value={userInfo.bio}
-                  onChange={(e) => {
-                    setBio(e.target.value);
-                  }}
-                />
-                <br />
-                <button className=" text-sm text-black bg-green-400 px-3 py-2 rounded">
-                  Save Bio
-                </button>
-              </div>
-              <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
-                <input value={userInfo.address} />
-                <br />
-                Age:{" "}
-                {Math.floor(moment().diff(userInfo.birthdate, "years", true))}
-              </div>
-            </div>{" "}
+            ) }
+           <div className="flex">
+  <div className="w-60 h-48 mr-4 relative">
+    <img
+      className="w-full h-full object-cover shadow-2xl rounded-lg"
+      src={userInfo.img}
+      alt="Profile"
+    />
+    <div className="absolute bottom-0 right-0">
+      <input
+        type="text"
+        name="img"
+        placeholder="Enter image URL"
+        value={userInfo.img}
+        onChange={(e) => setProfileImg(e.target.value)}
+        className="block w-full px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+      />
+    </div>
+  </div>
+  <div className="flex-grow">
+    <div className="mb-4">
+      <p className="font-bold text-lg">{userInfo.username}</p>
+      <textarea
+        className="block w-fit px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+        placeholder={userInfo.bio}
+        name="plan"
+        required
+        defaultValue={userInfo.bio}
+        onChange={(e) => {
+          setBio(e.target.value);
+        }}
+        disabled={false} // set to false to enable input
+      />
+
+    </div>
+    <div className="text-base text-gray-700">
+      <select
+        name="country"
+        className="block w-fit px-3 py-2 mt-2 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+        onChange={handleChange}
+        defaultValue={userInfo.country}
+      >
+        <option value={currentUser.country}>
+          {currentUser.country}
+        </option>
+        {countries.map((countries) => (
+          <option key={countries} value={countries}>
+            {countries}
+          </option>
+        ))}
+      </select>
+      <div className="mt-2 flex items-center">
+        <span className="mr-2">Age:</span>
+        <input
+          type="date"
+          name="birthdate"
+          value={new Date(userInfo.birthdate).toISOString().slice(0, 10)}
+          onChange={(e) => setBirthdate(e.target.value)}
+          className="block w-fit px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+{" "}
           </div>
 
           <div className="usersList">
@@ -195,18 +264,9 @@ function Profile() {
             </ol>
           </div>
         </>
-      ) : 
-      
-      
-      
-      
-      
-      
-      
-      (
+      ) : (
         <>
           <div className=" pb-28 h-full mt-2 bg-orange-50 border rounded-lg ">
-          
             <div className="self-center mt-5 mx-auto text-center bg-white  w-fit items-center justify-center flex border rounded-lg p-3">
               <div className="mx-5">
                 <div className="listTitles">Stories</div>
@@ -269,7 +329,7 @@ function Profile() {
             )}
             <div className="flex ">
               <img
-                className="w-60 h-48 float-left object-cover shadow-2xl"
+                className="w-60 h-48 object-cover shadow-2xl rounded-lg"
                 src={userInfo.img}
               />
               &nbsp;&nbsp;&nbsp;
@@ -279,7 +339,7 @@ function Profile() {
                 {userInfo.bio}
               </div>
               <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
-                {userInfo.address}
+                {userInfo.country}
                 <br />
                 Age:{" "}
                 {Math.floor(moment().diff(userInfo.birthdate, "years", true))}
@@ -312,7 +372,7 @@ function Profile() {
 
                       <div>
                         <div className="listTitles">Location</div>
-                        <div className="details">Test</div>
+                        <div className="details">{val.address}</div>
                       </div>
 
                       <div>
@@ -327,10 +387,15 @@ function Profile() {
                             to={`/writepost?edit=${val.id}`}
                             state={val.content}
                           >
-                            <Edit />
+                            <Edit className="cursor-pointer mr-2 hover:text-blue-800" />
                           </Link>
                           &nbsp;&nbsp;
-                          {<Delete className="cursor-pointer" />}
+                          {
+                            <Delete
+                              onClick={() => deleteStory(val.id)}
+                              className="cursor-pointer mr-2 hover:text-red-800"
+                            />
+                          }
                         </div>
                       </div>
                     </li>
