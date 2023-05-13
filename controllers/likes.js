@@ -12,33 +12,56 @@ export const getLikes = (req, res) => {
   };
   
 
-export const postLike = (req, res) => {
-
-    const q =
-      "INSERT INTO likes(`user_id`, `story_id`) VALUES (?)";
-
-    const values = [
-      req.body.user_id,
-      req.body.story_id,
-    ];
-
+  export const postLike = (req, res) => {
+    const q = "INSERT INTO likes(`user_id`, `story_id`) VALUES (?)";
+  
+    const values = [    req.body.user_id,    req.body.story_id,  ];
+  
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
+  
+      updateStoryLikes(req.body.story_id);
+  
       return res.json("Liked");
     });
- // });
-};
+  };
+  
 
-export const deleteLike = (req, res) => {
+  export const deleteLike = (req, res) => {
+    const likeid = req.params.id;
+    const q = "DELETE FROM likes WHERE `id` = ?";
+    
+    db.query(q, [likeid], (err, data) => {
+      if (err) {
+        return res.status(403).json("error");
+      }
+  
+      const storyId = req.params.storyid;
+      updateStoryLikes(storyId);
+  
+      return res.json("Unliked!");
+    });
+  };
+  
+  
+ 
 
-     const likeid = req.params.id;
-     const q = "DELETE FROM likes WHERE `id` = ?";
- 
-     db.query(q, [likeid], (err, data) => {
-       if (err)
-         return res.status(403).json("error ");
- 
-       return res.json("Unliked ! ");
-     });
- };
- 
+  export const updateStoryLikes = (storyId) => {
+    const q = `
+      UPDATE stories
+      SET likes = (
+        SELECT COUNT(*) FROM likes
+        WHERE story_id = ?
+      )
+      WHERE id = ?
+    `;
+    db.query(q, [storyId, storyId], (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(`Updated like count for story ${storyId}`);
+      }
+    });
+  };
+  
+  
