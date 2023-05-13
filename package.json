@@ -18,6 +18,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.22"
+    "node-geocoder": "^4.2.0",
+    "nodemon": "^2.0.22",
+    "nominatim-geocoder": "^0.1.4"
   }
 }
