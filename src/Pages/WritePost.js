@@ -17,10 +17,12 @@ import Button from "@mui/material/Button";
 import NominatimGeocoder from "nominatim-geocoder";
 import MapView from "../components/MapView";
 import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
-
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
+import Chip from "@mui/material/Chip";
+import TextField from '@mui/material/TextField';
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 function WritePost() {
   const { currentUser } = useContext(AuthContext);
@@ -29,54 +31,31 @@ function WritePost() {
 
   const state = useLocation().state;
 
-
   const [coordinates, setCoordinates] = useState([]);
 
- 
-/*
-  const handleCoordinatesChange = useCallback(
-    (newCoordinates) => {
-      if (coordinates.length >= 3) {
-        setCoordinates([...coordinates.slice(1), newCoordinates]);
-      } else {
-        setCoordinates(prevState => [...prevState, newCoordinates]);
-      }
-      console.log(coordinates.length); // log coordinates length here
-    },
-    [coordinates] // pass coordinates as a dependency to useCallback
-  );
-*/
-const handleClearCoordinates = () => {
-  setCoordinates([]);
-};
-const handleCoordinatesChange =  (newCoordinates) => {
+  const handleClearCoordinates = () => {
+    setCoordinates([]);
+  };
+
+  const handleCoordinatesChange = (newCoordinates) => {
     if (coordinates.length >= 3) {
-      setCoordinates((prevCoordinates) =>
-        [...prevCoordinates.slice(1), newCoordinates]
-      );
+      setCoordinates((prevCoordinates) => [
+        ...prevCoordinates.slice(1),
+        newCoordinates,
+      ]);
     } else {
       setCoordinates((prevCoordinates) => [...prevCoordinates, newCoordinates]);
     }
-
-    geoConvert.reverse({ lat: newCoordinates[0], lon: newCoordinates[1] }).then((response) => {
-      const city = response.address.city || response.address.town || response.address.village;
-      const country = response.address.country;
-      if (country === "Israel") {
-        console.log(`${city}, Palestine`);
-      } else {
-        console.log(`${city}, ${country}`);
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+   
   };
-  
+
   useEffect(() => {
-    console.log("Coordinates length:", coordinates.length);
     if (coordinates.length >= 4) {
-      setCoordinates((prevCoordinates) =>
-        [...prevCoordinates.slice(1)]
-      );
+      setCoordinates((prevCoordinates) => [...prevCoordinates.slice(1)]);
+    }
+    if (coordinates.length > 0) {
+      setGeocode(`${coordinates[0].lat}, ${coordinates[0].lng}`);
+      setAddress(coordinates[0].address);
     }
   }, [coordinates]);
 
@@ -85,33 +64,25 @@ const handleCoordinatesChange =  (newCoordinates) => {
   const [file, setFile] = useState(null);
   const [year, setYear] = useState(state?.year || "");
   const [imgUrl, setImgUrl] = useState(state?.img || "");
+  const [tags, setTags] = useState(state?.tags || []);
+  const [address, setAddress] = useState(state?.address || "");
+  const [geocode, setGeocode] = useState(state?.geocode || "");
   //const position = "34.4462209063811, 35.83014616188998";
   const [lat, setLat] = useState();
   const [lon, setLon] = useState();
-  const [address, setAddress] = useState("Pick a Location");
+  
+  
+  const [newTag, setNewTag] = useState("");
 
+  const handleTagAddition = (event) => {
+    event.preventDefault();
+    if (!newTag.trim()) return;
+    setTags([...tags, newTag.trim()]);
+    setNewTag("");
+  };
   const navigate = useNavigate();
 
-  //const upload = async () => {};
-
-  const [position, setPosition] = useState("51.505, -0.09"); // default position - later will change to User's location by Default
-
-  //console.log(position);
-
-  /* BUTTON */
-  const [buttons, setButtons] = useState([]); // State to keep track of buttons
-
-  // Function to add a new button
-  const addNewButton = () => {
-    const newButton = <></>;
-    setButtons([...buttons, newButton]);
-  };
-
-  // Event handler for button click
-  const handleButtonClick = () => {
-    console.log("Button clicked!");
-  };
-  ////////////////////////////
+  const [position, setPosition] = useState("37.98, 23.74"); // default position - later will change to User's location by Default
 
   const [anchorEl2, setAnchorEl2] = React.useState(null);
 
@@ -124,24 +95,7 @@ const handleCoordinatesChange =  (newCoordinates) => {
   };
   const open2 = Boolean(anchorEl2);
   const id2 = open2 ? "simple-popover" : undefined;
-////////////////////////////////////////
-  useEffect(() => {
-    if (lat && lon) {
-      geoConvert.reverse({ lat, lon }).then((response) => {
-        const city =
-          response.address.city ||
-          response.address.town ||
-          response.address.village;
-        const country = response.address.country;
-        if (country === "Israel") {
-          setAddress(`${city}, Palestine`);
-        } else {
-          setAddress(`${city}, ${country}`);
-        }
-        console.log(`${city}, ${country}`);
-      });
-    }
-  }, [lat, lon]);
+  ////////////////////////////////////////
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -155,6 +109,8 @@ const handleCoordinatesChange =  (newCoordinates) => {
             img: imgUrl,
             year: year,
             geocode: position,
+            geocode: `${coordinates[0].lat}, ${coordinates[0].lng}`,
+            address: coordinates[0].address,
           })
         : await axios
             .post(`http://localhost:8800/api/story/`, {
@@ -163,7 +119,10 @@ const handleCoordinatesChange =  (newCoordinates) => {
               img: imgUrl,
               postdate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
               year: year,
-              geocode: position,
+              geocode: geocode,
+              address: address,
+              tags: tags,
+              likes: 0,
               uid: currentUser.id,
             })
             .then((response) => {
@@ -211,16 +170,22 @@ const handleCoordinatesChange =  (newCoordinates) => {
   const id = open ? "simple-popover" : undefined;
 
   /////////////////////////////////////////////////
-  const colors = ["red","green","blue","orange","violet","white","black"]
-  const toolbarOptions = [  [{ font: ["serif", "monospace"] }, { size: ["small", "large", "huge"] }],
-  ["bold", "italic", "underline", "strike"],
-  [{ color: colors }, { background: colors }],
-  [{ script: "sub" }, { script: "super" }],
-  [{ header: [1, 2, false] }, "blockquote", "code-block"],
-  [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
-  [{ direction: "rtl" }, { align: [] }],
-  ["link", "image", "video", "formula"]
-];
+  const colors = ["red", "green", "blue", "orange", "violet", "white", "black"];
+  const toolbarOptions = [
+    [{ font: ["serif", "monospace"] }, { size: ["small", "large", "huge"] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: colors }, { background: colors }],
+    [{ script: "sub" }, { script: "super" }],
+    [{ header: [1, 2, false] }, "blockquote", "code-block"],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    [{ direction: "rtl" }, { align: [] }],
+    ["link", "image", "video", "formula"],
+  ];
 
   return (
     <div>
@@ -236,6 +201,25 @@ const handleCoordinatesChange =  (newCoordinates) => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+              <Box>
+      {tags.map((tag, index) => (
+        <Chip key={index} label={tag} />
+      ))}
+      <form onSubmit={handleTagAddition}>
+        <TextField
+          label="Add Tag"
+          variant="outlined"
+          size="small"
+          value={newTag}
+          onChange={(event) => setNewTag(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              handleTagAddition(event);
+            }
+          }}
+        />
+      </form>
+    </Box>
               <div className=" text-slate-900 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40">
                 <ReactQuill
                   className="editor"
@@ -243,7 +227,7 @@ const handleCoordinatesChange =  (newCoordinates) => {
                   value={value}
                   onChange={setValue}
                   modules={{
-                    toolbar: toolbarOptions
+                    toolbar: toolbarOptions,
                   }}
                 />
               </div>
@@ -287,49 +271,23 @@ const handleCoordinatesChange =  (newCoordinates) => {
               <div></div>
 
               <div className="item">
-                {buttons.map((button) => (
-                  <div className="mb-3" key={button.key}>
-                    <Button
-                      className="w-full"
-                      aria-describedby={id}
-                      variant="contained"
-                      onClick={handlepopoverClick}
-                    >
-                      {address}
-                    </Button>
-                    <Popover
-                      id={id}
-                      open={open}
-                      anchorEl={anchorEl}
-                      onClose={handleClose}
-                      anchorOrigin={{
-                        vertical: "top",
-                        horizontal: "left",
-                      }}
-                      transformOrigin={{
-                        vertical: "top",
-                        horizontal: "right",
-                      }}
-                    >
-                      <Typography sx={{ p: 2 }}>
-                        
-                      </Typography>
-                    </Popover>
-                  </div>
-                ))}
-                <button onClick={addNewButton}>
-                  <AddLocationAltIcon />
-                </button>
-                <button onClick={handleClearCoordinates}>Clear Coordinates</button>
-                <h1>Selected Coordinates:</h1>
-      <ul>
-        {coordinates.map((coord, index) => (
-          <li key={index}>
-            Lat: {coord.lat}, Lng: {coord.lng}
-          </li>
-        ))}
-      </ul>
-      <MapView onCoordinatesChange={handleCoordinatesChange} />
+                <h1>
+                  Selected Locations:{" "}
+                  {coordinates.length > 0 && (
+                    <HighlightOffIcon
+                      className="cursor-pointer float-right "
+                      onClick={handleClearCoordinates}
+                    />
+                  )}
+                </h1>
+                <ul>
+                  {coordinates.map((coord, index) => (
+                    <li className="m-1" key={index}>
+                      <Chip label={coord.address} variant="outlined" />
+                    </li>
+                  ))}
+                </ul>
+                <MapView onCoordinatesChange={handleCoordinatesChange} />
                 <h1>YEAR</h1>
                 {year}
                 <Box sx={{ width: 400 }}>
@@ -346,49 +304,33 @@ const handleCoordinatesChange =  (newCoordinates) => {
                 </Box>
 
                 <Button
-                      aria-describedby={id}
-                      variant="contained"
-                      onClick={handlePopoverClick2}
-                      className="font-medium text-xs submit-btn text-white px-3 py-2 rounded bg-slate-200"
-                    >
-                      Date and Time
-                    </Button>
-                    <Popover
-                      id={id2}
-                      open={open2}
-                      anchorEl={anchorEl2}
-                      onClose={handlePopoverClose2}
-                      anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "right",
-                      }}
-                    >
-                      <Typography sx={{ p: 2 }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <StaticDateTimePicker
-                         
-                          />
-                          {/* <button onClick={handleGetTimestamp}>Get Timestamp</button>*/}
-                        </LocalizationProvider>
-                      </Typography>
-                    </Popover>
-
-
+                  aria-describedby={id}
+                  variant="contained"
+                  onClick={handlePopoverClick2}
+                  className="font-medium text-xs submit-btn text-white px-3 py-2 rounded bg-slate-200"
+                >
+                  Date and Time
+                </Button>
+                <Popover
+                  id={id2}
+                  open={open2}
+                  anchorEl={anchorEl2}
+                  onClose={handlePopoverClose2}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                >
+                  <Typography sx={{ p: 2 }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <StaticDateTimePicker />
+                      {/* <button onClick={handleGetTimestamp}>Get Timestamp</button>*/}
+                    </LocalizationProvider>
+                  </Typography>
+                </Popover>
               </div>
             </div>
           </div>{" "}
-
-
-
-
-
-
-
-
-
-
-
-
         </>
       ) : (
         <>
@@ -459,40 +401,6 @@ const handleCoordinatesChange =  (newCoordinates) => {
               <div></div>
 
               <div className="item cursor-not-allowed">
-                {buttons.map((button) => (
-                  <div className="mb-3 cursor-not-allowed" key={button.key}>
-                    <Button
-                      disabled
-                      className="w-full cursor-not-allowed"
-                      aria-describedby={id}
-                      variant="contained"
-                    >
-                      {address}
-                    </Button>
-                    <Popover
-                      id={id}
-                      open={open}
-                      anchorEl={anchorEl}
-                      onClose={handleClose}
-                      anchorOrigin={{
-                        vertical: "top",
-                        horizontal: "left",
-                      }}
-                      transformOrigin={{
-                        vertical: "top",
-                        horizontal: "right",
-                      }}
-                    >
-                      <Typography sx={{ p: 2 }}>
-                        <MapView />
-                      </Typography>
-                    </Popover>
-                  </div>
-                ))}
-                <button onClick={addNewButton}>
-                  <AddLocationAltIcon />
-                </button>
-
                 <h1>YEAR</h1>
                 {year}
                 <Box sx={{ width: 400 }}>
