@@ -180,7 +180,7 @@ function UserProfile() {
 
                   <div>
                     <div className="listTitles">Location</div>
-                    <div className="details">Test</div>
+                    <div className="details">{val.address}</div>
                   </div>
 
                 
