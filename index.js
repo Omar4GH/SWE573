@@ -11,15 +11,10 @@ import cookieSession from 'cookie-session';
 const app = express()
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: '*',
     credentials: true
   }));
-/*
-  app.use(cors({
-    origin: 'http://localhost:10927',
-    credentials: true
-  }));
-*/
+
   app.use(cookieSession({
     name: 'session',
     keys: ['key1', 'key2']
