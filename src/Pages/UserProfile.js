@@ -5,7 +5,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import "../scss/style.scss";
 import Navbar from "../components/Navbar";
@@ -14,17 +14,16 @@ import { AuthContext } from "../context/authContext";
 
 import { Icon, divIcon, point } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 function UserProfile() {
-    
   const location = useLocation();
   const userid = location.pathname.split("/")[2];
-    console.log(userid);
+  console.log(userid);
 
   const [stories, setStories] = useState({});
   const [user, setUser] = useState("");
   const [editMode, setEditMode] = useState(false);
-
 
   const [bio, setBio] = useState("");
 
@@ -39,7 +38,7 @@ function UserProfile() {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8800/api/users/${userid}`
+          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${userid}`
         );
         setUser(res.data);
         // console.log(res.data);
@@ -57,7 +56,7 @@ function UserProfile() {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8800/api/story/user/${userid}`
+          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/user/${userid}`
         );
         setStories(res.data);
         // console.log(res.data);
@@ -71,34 +70,32 @@ function UserProfile() {
     fetchData();
   }, []);
 
-
   const position = "34.4462209063811, 35.83014616188998";
 
   const customIcon = new Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/819/819814.png",
-    // iconUrl: require(PlaceIcon),
-    iconSize: [38, 38],
+    iconUrl:
+    "https://cdn-icons-png.flaticon.com/512/4874/4874744.png",
+
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
   });
 
   return (
     <div>
-
-
-      <div className=" h-full mt-2 border rounded-lg pb-28">
-      <div className="self-center mt-5 mx-auto text-center bg-white w-fit items-center justify-center flex border rounded-lg p-3">
-              <div className="mx-5">
-                <div className="listTitles">Stories</div>
-                <div className="details">{Object.keys(stories).length}</div>
-              </div>
-              <div className="mx-5">
-                <div className="listTitles">Following</div>
-                <div className="details">{user.following}</div>
-              </div>
-              <div className="mx-5">
-                <div className="listTitles">Followers</div>
-                <div className="details">{user.followers}</div>
-              </div>
-     
+      <div className=" pb-28 h-full mt-2 bg-orange-50 border rounded-lg ">
+        <div className="self-center mt-5 mx-auto text-center bg-white  w-fit items-center justify-center flex border rounded-lg p-3">
+          <div className="mx-5">
+            <div className="listTitles">Stories</div>
+            <div className="details">{Object.keys(stories).length}</div>
+          </div>
+          <div className="mx-5">
+            <div className="listTitles">Following</div>
+            <div className="details">0</div>
+          </div>
+          <div className="mx-5">
+            <div className="listTitles">Followers</div>
+            <div className="details">0</div>
+          </div>
         </div>
         {Array.isArray(stories) ? (
           <div className="">
@@ -108,7 +105,6 @@ function UserProfile() {
               zoom={2}
               scrollWheelZoom={true}
             >
-             
               <TileLayer
                 attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors'
                 url="https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU"
@@ -138,9 +134,9 @@ function UserProfile() {
         ) : (
           <></>
         )}
-        <div className="flex">
+        <div className="flex ">
           <img
-            className="w-60 h-48 float-left object-cover shadow-2xl"
+            className="w-60 h-48 object-cover shadow-2xl rounded-lg"
             src={user.img}
           />
           &nbsp;&nbsp;&nbsp;
@@ -150,10 +146,9 @@ function UserProfile() {
             {user.bio}
           </div>
           <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
-            {user.address}
+            {user.country}
             <br />
-            Age:{" "}
-            {Math.floor(moment().diff(user.birthdate, "years", true))}
+            Age: {Math.floor(moment().diff(user.birthdate, "years", true))}
           </div>
         </div>{" "}
       </div>
@@ -164,8 +159,11 @@ function UserProfile() {
           {Array.isArray(stories) ? (
             stories.map((val, key) => {
               return (
-                <li key={key} onClick={() => navigate(`/story/${val.id}`)} className="shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl">
-                  
+                <li
+                  key={key}
+                  onClick={() => navigate(`/story/${val.id}`)}
+                  className="shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
+                >
                   <div className="">
                     <img
                       className="w-60 h-32 float-left object-cover"
@@ -183,10 +181,11 @@ function UserProfile() {
                     <div className="details">{val.address}</div>
                   </div>
 
-                
-
                   <div>
-                 
+                    <div className="details">
+                      <FavoriteIcon fontSize="small" className="mx-1" />
+                      {val.likes}
+                    </div>
                   </div>
                 </li>
               );
@@ -198,8 +197,6 @@ function UserProfile() {
           )}
         </ol>
       </div>
-
-
     </div>
   );
 }

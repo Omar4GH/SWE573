@@ -41,7 +41,8 @@ import TagIcon from "@mui/icons-material/Tag";
 import CalendarIcon from "@mui/icons-material/CalendarMonth";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
+import Tooltip from "@mui/material/Tooltip";
 
 function Feed() {
   const [stories, setStories] = useState([]);
@@ -99,7 +100,7 @@ function Feed() {
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8800/api/story/?year=${yearFilter}&tags=${tagsFilter}&title=${titleFilter}&userid=${userFilter}`
+        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/?year=${yearFilter}&tags=${tagsFilter}&title=${titleFilter}&userid=${userFilter}`
       );
       setStories(res.data);
       console.log(res);
@@ -110,7 +111,7 @@ function Feed() {
   const fetchUsers = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8800/api/users/?name=${usernameFilter}`
+        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/?name=${usernameFilter}`
       );
       setUsers(res.data);
       console.log(res);
@@ -133,17 +134,18 @@ function Feed() {
   const handleYearRangeChange = (event, newYearRange) => {
     setYearRange(newYearRange);
   };
-  const position = "34.4462209063811, 35.83014616188998";
+  const position = "41.04896168992059, 29.046300199304536";
 
   const customIcon = new Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/819/819814.png",
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/4874/4874744.png",
 
-    iconSize: [38, 38],
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
   });
 
   //////////////
   const handleCopy = (storyid) => {
-    const url = `http://localhost:3000/story/${storyid}`;
+    const url = `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/story/${storyid}`;
     navigator.clipboard.writeText(url);
   };
 
@@ -154,17 +156,17 @@ function Feed() {
       </h1>
 
       <div>
-        <Accordion 
-        sx={{backgroundColor: 'transparent', boxShadow: 'none',  margin: 0 }}
-        className="w-fit">
+        <Accordion
+          sx={{ backgroundColor: "transparent", boxShadow: "none", margin: 0 }}
+          className="w-fit"
+        >
           <AccordionSummary
-          
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
             id="panel1a-header"
             className="w-fit"
           >
-            <SearchIcon fontSize="large" className="hover:text-green-600"/>
+            <SearchIcon fontSize="large" className="hover:text-green-600" />
           </AccordionSummary>
           <AccordionDetails>
             <div className="flex items-center">
@@ -190,35 +192,34 @@ function Feed() {
                 <TagIcon className="w-4 h-4 absolute top-3 left-2 text-gray-400" />
               </div>
 
-                <Autocomplete
-                  className="w-72 bg-white rounded-md"
-                  options={users}
-                  getOptionLabel={(users) => users.username || ""}
-                  value={users.find((option) => option.id === userFilter)}
-                  onChange={handleUserChange}
-                  onInputChange={handleUsernameChange}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={
-                        <div className="flex items-center">
-                          <PersonIcon />
-                          <span>Search by User</span>
-                          
-                        </div>
-                      }
-                      variant="outlined"
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <React.Fragment>
-                            {params.InputProps.endAdornment}
-                          </React.Fragment>
-                        ),
-                      }}
-                    />
-                  )}
-                />
+              <Autocomplete
+                className="w-72 bg-white rounded-md"
+                options={users}
+                getOptionLabel={(users) => users.username || ""}
+                value={users.find((option) => option.id === userFilter)}
+                onChange={handleUserChange}
+                onInputChange={handleUsernameChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={
+                      <div className="flex items-center">
+                        <PersonIcon />
+                        <span>Search by User</span>
+                      </div>
+                    }
+                    variant="outlined"
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <React.Fragment>
+                          {params.InputProps.endAdornment}
+                        </React.Fragment>
+                      ),
+                    }}
+                  />
+                )}
+              />
             </div>
             <div className="flex items-center mr-4 ">
               <div className="relative mb-5 mr-4 " style={{ zIndex: 9999 }}>
@@ -247,12 +248,6 @@ function Feed() {
       </div>
 
       <div>
-        <button
-          className="absolute top-2 right-2 z-50 bg-gray-200 px-2 py-1 rounded-md"
-          onClick={handleMapExpand}
-        >
-          {mapExpanded ? "Collapse Map" : "Expand Map"}
-        </button>
         <MapContainer
           key={mapExpanded}
           className={
@@ -289,20 +284,64 @@ function Feed() {
                 icon={
                   new Icon({
                     iconUrl:
-                      "https://cdn-icons-png.flaticon.com/512/819/819814.png",
-                    // iconUrl: require(PlaceIcon),
-                    iconSize: [38, 38],
+                      "https://cdn-icons-png.flaticon.com/512/4874/4874744.png",
+
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
                   })
                 }
               >
-                <Popup>
-                  {" "}
-                  <Link className="link" to={`/story/${story.id}`}>
-                    <div>
-                      <img className="popup-img" src={story.img} alt="" />
+                <Popup >
+                  <Link to={`/story/${story.id}`}>
+                    <div className="w-56"
+                      sx={{
+                        maxWidth: 350,
+                        width: "100%",
+                        position: "relative",
+                      }}
+                    >
+                      <Tooltip title="Copy">
+                        <ShareIcon
+                          onClick={() => handleCopy(story.id)}
+                          className="shareiconMap text-black cursor-pointer mt-7 mr-2 transition duration-500 ease-in-out transform hover:scale-125 absolute top-0 right-0 z-50"
+                        />
+                      </Tooltip>
+                      <div className="mr-4">
+                        <Link to={`/story/${story.id}`}>
+                          <h2 className="text-lg font-bold text-gray-900">
+                            {story.title}
+                          </h2>
+                        </Link>
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex items-center">
+                            <Avatar
+                              alt={story.username}
+                              src={story.userImg}
+                              className="mr-1"
+                            />
+                            <span className="text-gray-700 text-xs">
+                              {story.username}
+                            </span>
+                          </div>
+                          <span className="text-gray-700 text-xs">
+                            {moment(story.postdate).fromNow()}
+                            <br />
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-14">
+                        <div
+                          className="absolute bottom-0 left-0 right-0"
+                          style={{ height: "30%" }}
+                        >
+                          <img
+                            src={story.img}
+                            alt="Story Banner"
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <h1 className="text-center text-2xl">{story.title}</h1>{" "}
-                    <p className="popup-year">{story.year}</p>
                   </Link>
                 </Popup>
               </Marker>
@@ -318,6 +357,12 @@ function Feed() {
             className="shadow-md h-fit transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
           >
             <div className="relative h-40 lg:h-56">
+              <Tooltip title="Copy">
+                <ShareIcon
+                  onClick={() => handleCopy(story.id)}
+                  className="shareicon cursor-pointer m-3 transition duration-500 ease-in-out transform hover:scale-125 absolute top-0 right-0 z-50"
+                />
+              </Tooltip>
               <Link to={`/story/${story.id}`}>
                 <img
                   src={story.img}
@@ -327,6 +372,7 @@ function Feed() {
                 />
               </Link>
             </div>
+
             <div className="p-4">
               <Link to={`/story/${story.id}`}>
                 <p className="text-gray-700 float-right flex text-sm mb-2">

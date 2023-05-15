@@ -12,6 +12,7 @@ import { AuthContext } from "../context/authContext";
 import DoneIcon from '@mui/icons-material/Done';
 import { Icon, divIcon, point } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 function Profile() {
   const { currentUser } = useContext(AuthContext);
@@ -29,7 +30,7 @@ function Profile() {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8800/api/story/user/${currentUser.id}`
+          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/user/${currentUser.id}`
         );
         setStories(res.data);
         // console.log(res.data);
@@ -47,7 +48,7 @@ function Profile() {
   const getUser = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8800/api/users/${currentUser.id}`
+        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${currentUser.id}`
       );
       setUserInfo(res.data);
 
@@ -62,7 +63,7 @@ function Profile() {
   };
 
   const deleteStory = (id) => {
-    axios.delete(`http://localhost:8800/api/story/${id}`).then((response) => {
+    axios.delete(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/${id}`).then((response) => {
       setTrigger(!trigger);
     });
   };
@@ -70,9 +71,11 @@ function Profile() {
   const position = "34.4462209063811, 35.83014616188998";
 
   const customIcon = new Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/819/819814.png",
-    // iconUrl: require(PlaceIcon),
-    iconSize: [38, 38],
+    iconUrl:
+    "https://cdn-icons-png.flaticon.com/512/4874/4874744.png",
+
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
   });
 
   const [countries, setCountries] = useState([]);
@@ -100,7 +103,7 @@ function Profile() {
 
     try {
       await axios
-        .put(`http://localhost:8800/api/users/${currentUser.id}`, {
+        .put(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${currentUser.id}`, {
           bio: bio || userInfo.bio,
           birthdate: birthdate || new Date(userInfo.birthdate).toISOString().slice(0, 10),
           img: profileImg || userInfo.img,
@@ -274,11 +277,11 @@ function Profile() {
               </div>
               <div className="mx-5">
                 <div className="listTitles">Following</div>
-                <div className="details">{userInfo.following}</div>
+                <div className="details">0</div>
               </div>
               <div className="mx-5">
                 <div className="listTitles">Followers</div>
-                <div className="details">{userInfo.followers}</div>
+                <div className="details">0</div>
               </div>
               <div
                 className="float-right right-96 text-right text-xs absolute m-0 cursor-pointer text-gray-700"
@@ -379,7 +382,10 @@ function Profile() {
                         <div className="listTitles">Status</div>
                         <div className="details">Public</div>
                       </div>
-
+                      <div>
+                <div className="details"><FavoriteIcon fontSize="small" className="mx-1" />
+                  {val.likes}</div>  
+              </div>
                       <div>
                         <div className="listTitles">Actions</div>
                         <div className="details">
