@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import NominatimGeocoder from "nominatim-geocoder";
 
 const MapView = ({ onCoordinatesChange }) => {
+  
   const geoConvert = new NominatimGeocoder();
   const [address, setAddress] = useState("");
   let map;
