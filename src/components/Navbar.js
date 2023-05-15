@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import Avatar from "@mui/material/Avatar";
@@ -7,8 +7,27 @@ import { red } from "@mui/material/colors";
 import logo from "../assets/LogoGeoMemoirs.png";
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
+import axios from "axios";
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
+  const [userImg, setUserImg] = useState("");
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    try {
+      const res = await axios.get(
+        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${currentUser.id}`
+      );
+      setUserImg(res.data.img);
+
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="navbar">
@@ -41,7 +60,7 @@ const Navbar = () => {
                 to={"/profile"}
                 className="  "
               >
-                <Avatar className="shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl" sx={{width: 96, height:96, bgcolor: red[500] }} src={currentUser.img} aria-label="avatar"/>
+                <Avatar className="shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl" sx={{width: 96, height:96, bgcolor: red[500] }} src={userImg} aria-label="avatar"/>
               </Link>
               <Link
                 to={"/"}
