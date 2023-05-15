@@ -21,7 +21,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
 import Chip from "@mui/material/Chip";
-import TextField from '@mui/material/TextField';
+import { IconButton } from "@material-ui/core";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+
+import TextField from "@mui/material/TextField";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 function WritePost() {
@@ -46,7 +49,6 @@ function WritePost() {
     } else {
       setCoordinates((prevCoordinates) => [...prevCoordinates, newCoordinates]);
     }
-   
   };
 
   useEffect(() => {
@@ -57,6 +59,17 @@ function WritePost() {
       setGeocode(`${coordinates[0].lat}, ${coordinates[0].lng}`);
       setAddress(coordinates[0].address);
     }
+    if (coordinates.length > 1) {
+      setGeocode(`${coordinates[0].lat}, ${coordinates[0].lng}`);
+      setGeocode2(`${coordinates[1].lat}, ${coordinates[1].lng}`);
+      setAddress(coordinates[0].address);
+    }
+    if (coordinates.length > 2) {
+      setGeocode(`${coordinates[0].lat}, ${coordinates[0].lng}`);
+      setGeocode2(`${coordinates[1].lat}, ${coordinates[1].lng}`);
+      setGeocode3(`${coordinates[2].lat}, ${coordinates[2].lng}`);
+      setAddress(coordinates[0].address);
+    }
   }, [coordinates]);
 
   const [value, setValue] = useState(state?.content || "");
@@ -64,14 +77,15 @@ function WritePost() {
   const [file, setFile] = useState(null);
   const [year, setYear] = useState(state?.year || "");
   const [imgUrl, setImgUrl] = useState(state?.img || "");
-  const [tags, setTags] = useState(state?.tags || []);
+  const [tags, setTags] = useState(state ? JSON.parse(state.tags) : []);
   const [address, setAddress] = useState(state?.address || "");
   const [geocode, setGeocode] = useState(state?.geocode || "");
+  const [geocode2, setGeocode2] = useState(state?.geocode2 || "");
+  const [geocode3, setGeocode3] = useState(state?.geocode3 || "");
   //const position = "34.4462209063811, 35.83014616188998";
   const [lat, setLat] = useState();
   const [lon, setLon] = useState();
-  
-  
+
   const [newTag, setNewTag] = useState("");
 
   const handleTagAddition = (event) => {
@@ -103,23 +117,29 @@ function WritePost() {
 
     try {
       state
-        ? await axios.put(`http://localhost:8800/api/story/${state.id}`, {
+        ? await axios.put(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/${state.id}`, {
             title: title,
             content: value,
             img: imgUrl,
             year: year,
-            geocode: position,
-            geocode: `${coordinates[0].lat}, ${coordinates[0].lng}`,
-            address: coordinates[0].address,
+            geocode: geocode,
+            geocode2: geocode2,
+            geocode3: geocode3,
+            address: address,
+            tags: tags,
+          }).then((response) => {
+            navigate(`/story/${state.id}`);
           })
         : await axios
-            .post(`http://localhost:8800/api/story/`, {
+            .post(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/`, {
               title: title,
               content: value,
               img: imgUrl,
               postdate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
               year: year,
               geocode: geocode,
+              geocode2: geocode2,
+              geocode3: geocode3,
               address: address,
               tags: tags,
               likes: 0,
@@ -184,15 +204,20 @@ function WritePost() {
       { indent: "+1" },
     ],
     [{ direction: "rtl" }, { align: [] }],
-    ["link", "image", "video", "formula"],
+    ["link", "video", "formula"],
   ];
+  
 
   return (
     <div>
       {" "}
       {currentUser ? (
         <>
-          <h1>Post a Story</h1>
+          <div className="flex flex-col items-center justify-center ">
+            <h1 className="text-4xl font-bold mt-5 text-gray-900 mb24">
+              Post a Story
+            </h1>
+          </div>
           <div className="add">
             <div className="content">
               <input
@@ -201,25 +226,39 @@ function WritePost() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              <Box>
-      {tags.map((tag, index) => (
-        <Chip key={index} label={tag} />
-      ))}
-      <form onSubmit={handleTagAddition}>
-        <TextField
-          label="Add Tag"
-          variant="outlined"
-          size="small"
-          value={newTag}
-          onChange={(event) => setNewTag(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              handleTagAddition(event);
-            }
-          }}
-        />
-      </form>
-    </Box>
+
+              <Box className=" gap-2 items-center">
+                {tags.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    color="primary"
+                    label={tag}
+                    className="mr-1 hover:bg-blue-200 transition duration-300 ease-in-out"
+                  />
+                ))}
+                <form
+                  onSubmit={handleTagAddition}
+                  className="flex items-center mt-3"
+                >
+                  <TextField
+                    label="Add Tag"
+                    variant="outlined"
+                    size="small"
+                    className="bg-white mr-2"
+                    value={newTag}
+                    onChange={(event) => setNewTag(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        handleTagAddition(event);
+                      }
+                    }}
+                  />
+                  <IconButton type="submit" aria-label="add tag">
+                    <AddCircleIcon className="text-green-500 hover:text-green-600 transition duration-300 ease-in-out" />
+                  </IconButton>
+                </form>
+              </Box>
+
               <div className=" text-slate-900 bg-white border rounded-md focus:border-orange-200 focus:ring-orange-100 focus:outline-none focus:ring focus:ring-opacity-40">
                 <ReactQuill
                   className="editor"
@@ -234,7 +273,7 @@ function WritePost() {
             </div>
             <div className="menu ">
               <div className="item">
-                <h1>Publish</h1>
+                <h1 className="font-bold">Publish</h1>
                 <span>
                   <b>Status: </b> Draft
                 </span>
@@ -263,14 +302,13 @@ function WritePost() {
                 />
                 <br />
                 <div className="buttons">
-                  <button disabled>Save as a draft</button>
                   <button onClick={handleClick}>Publish</button>
                 </div>
               </div>
 
               <div></div>
 
-              <div className="item">
+              <div className="item"><h1 className="font-bold">Select up to 3 Locations</h1>
                 <h1>
                   Selected Locations:{" "}
                   {coordinates.length > 0 && (
@@ -283,11 +321,12 @@ function WritePost() {
                 <ul>
                   {coordinates.map((coord, index) => (
                     <li className="m-1" key={index}>
-                      <Chip label={coord.address} variant="outlined" />
+                      <Chip label={coord.address} variant="outlined" color="success" />
                     </li>
                   ))}
                 </ul>
                 <MapView onCoordinatesChange={handleCoordinatesChange} />
+                <h1 className="mt-3 font-bold">Enter Date</h1>
                 <h1>YEAR</h1>
                 {year}
                 <Box sx={{ width: 400 }}>
@@ -302,7 +341,7 @@ function WritePost() {
                     max={2023}
                   />
                 </Box>
-
+                <h1 className="font-bold mb-3">Specific Date & Time</h1>
                 <Button
                   aria-describedby={id}
                   variant="contained"
