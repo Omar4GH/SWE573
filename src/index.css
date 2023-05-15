@@ -410,3 +410,44 @@ ol.comments-list>li {
    border-bottom: 1px solid #ddd;
  }
  
+ .shareicon {
+   color: white;
+   filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.753));
+ }
+
+ .shareiconMap {
+   color: black;
+   filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.534));
+ }
+
+/*//////////////////*/
+.react-icon, .node-icon {
+   margin: 0 5px;
+ }
+ 
+ .react-icon {
+   color: #61dafb;
+ }
+ 
+ .node-icon {
+   color: #3c873a;
+ }
+ 
+ .profile-photo {
+   height: 100px;
+   width: 100px;
+   border-radius: 50%;
+   margin: 10px;
+ }
+ 
+ .profile-link {
+   color: #61dafb;
+   text-decoration: none;
+ }
+ 
+ .profile-link:hover {
+   text-decoration: underline;
+ }
+
+ /*//////////////////////////////*/
+ 

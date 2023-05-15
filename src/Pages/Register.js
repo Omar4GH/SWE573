@@ -19,7 +19,7 @@ const navigate = useNavigate();
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8800/api/auth/register", inputs);
+      await axios.post("https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/auth/register", inputs);
       navigate("/signin");
     } catch (err) {
       setError(err.response.data);
