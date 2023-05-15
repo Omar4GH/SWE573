@@ -72,7 +72,7 @@ const buildFilterQuery = ({ year, title, tags }) => {
 
 export const getStory = (req, res) => {
   const q =
-    "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode`, `address`, `tags`, `likes`, `uid` FROM users u JOIN stories s ON u.id = s.uid WHERE s.id = ? ";
+    "SELECT s.id, `username`, `title`, `content`, s.img, u.img AS userImg, `year`, `postdate`, `geocode`, `geocode2`, `geocode3`, `address`, `tags`, `likes`, `uid` FROM users u JOIN stories s ON u.id = s.uid WHERE s.id = ? ";
   db.query(q, [req.params.id], (err, data) => {
     if (err) return res.status(500).json(err);
 
@@ -104,7 +104,7 @@ export const getUserStories = (req, res) => {
 export const postStory = (req, res) => {
 
      const q =
-       "INSERT INTO stories(`title`, `content`, `img`, `postdate`, `year`, `geocode`, `address`, `tags`, `likes`, `uid`) VALUES (?)";
+       "INSERT INTO stories(`title`, `content`, `img`, `postdate`, `year`, `geocode`,`geocode2`,`geocode3`, `address`, `tags`, `likes`, `uid`) VALUES (?)";
  
      const values = [
        req.body.title,
@@ -113,9 +113,11 @@ export const postStory = (req, res) => {
        req.body.postdate,
        req.body.year,
        req.body.geocode,
+       req.body.geocode2,
+       req.body.geocode3,
        req.body.address,
-       req.body.likes,
        JSON.stringify(req.body.tags),
+       req.body.likes,
        req.body.uid,
      ];
  
@@ -142,15 +144,22 @@ export const deleteStory = (req, res) => {
 };
 
 export const updateStory = (req, res) => {
-
-    const storyId = req.params.id;
-    const q =
-      "UPDATE stories SET `title`=?,`content`=?,`img`=?,`year`=?,`geocode`=? ,`address`=?, `tags`=? WHERE `id` = ?";
-
-    const values = [req.body.title, req.body.content, req.body.img, req.body.year, req.body.geocode, req.body.address, req.body.tags];
-
-    db.query(q, [...values, storyId], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.json("Story has been updated.");
-    });
+  const storyId = req.params.id;
+  const q = "UPDATE stories SET `title`=?,`content`=?,`img`=?,`year`=?,`geocode`=?,`geocode2`=?,`geocode3`=?,`address`=?,`tags`=? WHERE `id` = ?";
+  const values = [
+    req.body.title,
+    req.body.content,
+    req.body.img,
+    req.body.year,
+    req.body.geocode,
+    req.body.geocode2,
+    req.body.geocode3,
+    req.body.address,
+    JSON.stringify(req.body.tags),
+    storyId,
+  ];
+  db.query(q, values, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json("Story has been updated.");
+  });
 };
