@@ -37,7 +37,7 @@ function UserProfile() {
     const fetchData = async () => {
       try {
         const res = await _axios.get(
-          `husers/${userid}`
+          `users/${userid}`
         );
         setUser(res.data);
         // console.log(res.data);
