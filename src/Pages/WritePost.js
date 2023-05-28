@@ -183,7 +183,7 @@ function WritePost() {
               })
               .then((response) => {
                // console.log(response.data);
-                navigate(`/story/${response.data.id}`);
+                navigate(`/profile`);
               });
       } catch (err) {
         console.log(err);

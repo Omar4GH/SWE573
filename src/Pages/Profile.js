@@ -85,12 +85,18 @@ function Profile() {
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    fetch("https://restcountries.com/v2/all")
+    fetch("https://countriesnow.space/api/v0.1/countries")
       .then((response) => response.json())
       .then((data) => {
-        setCountries(data.map((country) => country.name));
+        console.log(data.data); // Log the response data
+        setCountries(data.data.map((country) => country.country));
+      })
+      .catch((error) => {
+        console.error("Error fetching countries:", error);
       });
   }, []);
+  
+  
 
   const handleChange = (event) => {
     setCountry(event.target.value);

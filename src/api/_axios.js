@@ -3,6 +3,7 @@ import axios from "axios";
 // Local: http://localhost:8800/api
 // Google Cloud Run Live: https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api
 // AWS EC2 Live : http://35.157.83.4:8800/api
+// Secured AWS EC2 Live : https://server.omarghamrawi.net/api
 
 let config = {
   baseURL: "https://server.omarghamrawi.net/api",
