@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import logo from "../assets/LogoGeoMemoirs.png";
+import _axios from "../api/_axios";
 
 function Register() {
 
@@ -19,7 +19,7 @@ const navigate = useNavigate();
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/auth/register", inputs);
+      await _axios.post("auth/register", inputs);
       navigate("/signin");
     } catch (err) {
       setError(err.response.data);

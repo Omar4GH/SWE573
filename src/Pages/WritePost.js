@@ -1,14 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
-import Navbar from "../components/Navbar";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import LocationPicker from "react-leaflet-location-picker";
+
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import Popover from "@mui/material/Popover";
@@ -16,8 +13,15 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import NominatimGeocoder from "nominatim-geocoder";
 import MapView from "../components/MapView";
-import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "@mui/material/styles";
+import "@mui/material";
+
+import DatePicker from "react-datepicker";
+import { DateRange } from 'react-date-range';
+import "react-date-range/dist/styles.css"; // main css file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
 import Chip from "@mui/material/Chip";
@@ -26,10 +30,11 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 
 import TextField from "@mui/material/TextField";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import _axios from "../api/_axios";
 
 function WritePost() {
   const { currentUser } = useContext(AuthContext);
-
+  const [error, setError] = useState("");
   const geoConvert = new NominatimGeocoder();
 
   const state = useLocation().state;
@@ -71,11 +76,12 @@ function WritePost() {
       setAddress(coordinates[0].address);
     }
   }, [coordinates]);
-
+  
   const [value, setValue] = useState(state?.content || "");
   const [title, setTitle] = useState(state?.title || "");
   const [file, setFile] = useState(null);
   const [year, setYear] = useState(state?.year || "");
+  const [dateTime, setDateTime] = useState(state?.fulldate || null);
   const [imgUrl, setImgUrl] = useState(state?.img || "");
   const [tags, setTags] = useState(state ? JSON.parse(state.tags) : []);
   const [address, setAddress] = useState(state?.address || "");
@@ -85,15 +91,30 @@ function WritePost() {
   //const position = "34.4462209063811, 35.83014616188998";
   const [lat, setLat] = useState();
   const [lon, setLon] = useState();
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: state?.startdate || new Date(),
+      endDate: state?.enddate || null,
+      key: "selection",
+    },
+  ]);
 
   const [newTag, setNewTag] = useState("");
 
   const handleTagAddition = (event) => {
     event.preventDefault();
     if (!newTag.trim()) return;
-    setTags([...tags, newTag.trim()]);
+    const newTagObject = {
+      id: Date.now(),
+      label: newTag.trim(),
+    };
+    setTags((prevTags) => [...prevTags, newTagObject]);
     setNewTag("");
   };
+  const handleTagDeletion = (tagId) => {
+    setTags((prevTags) => prevTags.filter((tag) => tag.id !== tagId));
+  };
+
   const navigate = useNavigate();
 
   const [position, setPosition] = useState("37.98, 23.74"); // default position - later will change to User's location by Default
@@ -110,64 +131,64 @@ function WritePost() {
   const open2 = Boolean(anchorEl2);
   const id2 = open2 ? "simple-popover" : undefined;
   ////////////////////////////////////////
+  const handleDateTimeChange = (newDateTime) => {
+    setDateTime(newDateTime);
+   // console.log(newDateTime);
+  };
 
   const handleClick = async (e) => {
     e.preventDefault();
     // const imgUrl = await upload();
-
-    try {
-      state
-        ? await axios.put(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/${state.id}`, {
-            title: title,
-            content: value,
-            img: imgUrl,
-            year: year,
-            geocode: geocode,
-            geocode2: geocode2,
-            geocode3: geocode3,
-            address: address,
-            tags: tags,
-          }).then((response) => {
-            navigate(`/story/${state.id}`);
-          })
-        : await axios
-            .post(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/`, {
-              title: title,
-              content: value,
-              img: imgUrl,
-              postdate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-              year: year,
-              geocode: geocode,
-              geocode2: geocode2,
-              geocode3: geocode3,
-              address: address,
-              tags: tags,
-              likes: 0,
-              uid: currentUser.id,
-            })
-            .then((response) => {
-              console.log(response.data);
-              navigate(`/story/${response.data.id}`);
-            });
-    } catch (err) {
-      console.log(err);
+    if (coordinates.length == 0 || title == "" || imgUrl == "" || year =="") {
+      setError("Fill all fields");
+      console.log("fill all fields");
+    } else {
+      try {
+        state
+          ? await _axios
+              .put(`story/${state.id}`, {
+                title: title,
+                content: value,
+                img: imgUrl,
+                fulldate: moment(dateTime).format("YYYY-MM-DD HH:mm:ss"),
+                startdate: moment(dateRange[0].startDate).format("YYYY-MM-DD HH:mm:ss"),
+                enddate: moment(dateRange[0].endDate).format("YYYY-MM-DD HH:mm:ss"),
+                year: year,
+                geocode: geocode,
+                geocode2: geocode2,
+                geocode3: geocode3,
+                address: address,
+                tags: tags,
+              })
+              .then((response) => {
+                navigate(`/story/${state.id}`);
+              })
+          : await _axios
+              .post(`story/`, {
+                title: title,
+                content: value,
+                img: imgUrl,
+                postdate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                fulldate: moment(dateTime).format("YYYY-MM-DD HH:mm:ss"),
+                startdate: moment(dateRange[0].startDate).format("YYYY-MM-DD HH:mm:ss"),
+                enddate: moment(dateRange[0].endDate).format("YYYY-MM-DD HH:mm:ss"),
+                year: year,
+                geocode: geocode,
+                geocode2: geocode2,
+                geocode3: geocode3,
+                address: address,
+                tags: tags,
+                likes: 0,
+                uid: currentUser.id,
+              })
+              .then((response) => {
+               // console.log(response.data);
+                navigate(`/story/${response.data.id}`);
+              });
+      } catch (err) {
+        console.log(err);
+      }
     }
-  };
-
-  const pointVals = [];
-  const pointMode = {
-    // banner: true,
-    control: {
-      values: pointVals,
-      onClick: (point) => {
-        console.log("I've just been clicked on the map!", point);
-        setPosition(point.join(", "));
-        setLat(point[0]);
-        setLon(point[1]);
-      },
-      onRemove: (point) =>
-        console.log("I've just been clicked for removal :(", point),
-    },
   };
 
   function valuetext(value) {
@@ -206,7 +227,6 @@ function WritePost() {
     [{ direction: "rtl" }, { align: [] }],
     ["link", "video", "formula"],
   ];
-  
 
   return (
     <div>
@@ -227,12 +247,13 @@ function WritePost() {
                 onChange={(e) => setTitle(e.target.value)}
               />
 
-              <Box className=" gap-2 items-center">
-                {tags.map((tag, index) => (
+              <Box className="gap-2 items-center">
+                {tags.map((tag) => (
                   <Chip
-                    key={index}
+                    key={tag.id}
                     color="primary"
-                    label={tag}
+                    label={tag.label}
+                    onDelete={() => handleTagDeletion(tag.id)}
                     className="mr-1 hover:bg-blue-200 transition duration-300 ease-in-out"
                   />
                 ))}
@@ -304,69 +325,96 @@ function WritePost() {
                 <div className="buttons">
                   <button onClick={handleClick}>Publish</button>
                 </div>
+
+                {error && <p className="text-red-700">{error}</p>}
               </div>
 
-              <div></div>
-
-              <div className="item"><h1 className="font-bold">Select up to 3 Locations</h1>
-                <h1>
-                  Selected Locations:{" "}
-                  {coordinates.length > 0 && (
-                    <HighlightOffIcon
-                      className="cursor-pointer float-right "
-                      onClick={handleClearCoordinates}
+              <div className="item">
+                <div>
+                  <h1 className="font-bold">Select up to 3 Locations <p className="text-red-600 text-xs float-right">required</p></h1>
+                  <h1>
+                    Selected Locations:{" "}
+                    {coordinates.length > 0 && (
+                      <HighlightOffIcon
+                        className="cursor-pointer float-right "
+                        onClick={handleClearCoordinates}
+                      />
+                    )}
+                  </h1>
+                  <ul>
+                    {coordinates.map((coord, index) => (
+                      <li className="m-1" key={index}>
+                        <Chip
+                          label={coord.address}
+                          variant="outlined"
+                          color="success"
+                          className="custom-chip"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                  <MapView onCoordinatesChange={handleCoordinatesChange} />
+                </div>
+                <h1 className="mt-3 text-center font-bold">Enter Date</h1>
+                <div className="border m-1 p-1">
+                  <h1 className="mt-1 mb-2 font-bold">Year<p className="text-red-600 text-xs float-right">required</p></h1>
+                  <p className="text-center text-base">{year}</p>
+                  <Box sx={{ width: 400 }}>
+                    <Slider
+                      aria-label="Year"
+                      defaultValue={2020}
+                      getAriaValueText={valuetext}
+                      valueLabelDisplay="auto"
+                      step={1}
+                      marks
+                      min={1920}
+                      max={2023}
                     />
-                  )}
-                </h1>
-                <ul>
-                  {coordinates.map((coord, index) => (
-                    <li className="m-1" key={index}>
-                      <Chip label={coord.address} variant="outlined" color="success" />
-                    </li>
-                  ))}
-                </ul>
-                <MapView onCoordinatesChange={handleCoordinatesChange} />
-                <h1 className="mt-3 font-bold">Enter Date</h1>
-                <h1>YEAR</h1>
-                {year}
-                <Box sx={{ width: 400 }}>
-                  <Slider
-                    aria-label="Year"
-                    defaultValue={2020}
-                    getAriaValueText={valuetext}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1920}
-                    max={2023}
-                  />
-                </Box>
-                <h1 className="font-bold mb-3">Specific Date & Time</h1>
-                <Button
-                  aria-describedby={id}
-                  variant="contained"
-                  onClick={handlePopoverClick2}
-                  className="font-medium text-xs submit-btn text-white px-3 py-2 rounded bg-slate-200"
-                >
-                  Date and Time
-                </Button>
-                <Popover
-                  id={id2}
-                  open={open2}
-                  anchorEl={anchorEl2}
-                  onClose={handlePopoverClose2}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                >
-                  <Typography sx={{ p: 2 }}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <StaticDateTimePicker />
-                      {/* <button onClick={handleGetTimestamp}>Get Timestamp</button>*/}
-                    </LocalizationProvider>
-                  </Typography>
-                </Popover>
+                  </Box>
+                </div>{" "}
+                <div className="border m-2 p-5">
+                  <h1 className="font-bold mb-3">Specific Date & Time<p className="text-blue-600 text-xs float-right">optional</p></h1>
+
+                  <Button
+                    aria-describedby={id2}
+                    variant="contained"
+                    onClick={handlePopoverClick2}
+                    className="date font-medium w-full text-xs submit-btn text-white px-3 py-2 rounded bg-slate-200"
+                  >
+                    {dateTime ? dateTime.toString() : "Date and Time"}
+                  </Button>
+                  <Popover
+                    id={id2}
+                    open={open2}
+                    anchorEl={anchorEl2}
+                    onClose={handlePopoverClose2}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                  >
+                    <Typography sx={{ p: 2 }}>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <StaticDateTimePicker
+                          value={dateTime}
+                          onChange={handleDateTimeChange}
+                        />
+                      </LocalizationProvider>
+                    </Typography>
+                  </Popover>
+                </div>{" "}
+                <div className="border m-2 p-5">
+                  <h1 className="font-bold mt-3 mb-2">Date Range <p className="text-blue-600 text-xs float-right">optional</p></h1>
+                  <span className="flex">
+                    <DateRange
+                      editableDateInputs={true}
+                      onChange={(item) => setDateRange([item.selection])}
+                      moveRangeOnFirstSelection={false}
+                      ranges={dateRange}
+                    />
+                  </span>
+                  <p>{dateRange[0].endDate && dateRange[0].startDate.toLocaleDateString() +" to "+dateRange[0].endDate.toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
           </div>{" "}

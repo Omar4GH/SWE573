@@ -14,7 +14,6 @@ import Register from "./Pages/Register";
 import SignIn from "./Pages/SignIn";
 import Story from "./Pages/Story";
 import WritePost from "./Pages/WritePost";
-
 import "./index.css";
 import UserProfile from "./Pages/UserProfile";
 

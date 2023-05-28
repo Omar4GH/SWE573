@@ -11,7 +11,7 @@ const MapView = ({ onCoordinatesChange }) => {
   let marker;
 
   useEffect(() => {
-    map = L.map("map").setView([51.505, -0.09], 13);
+    map = L.map("map").setView([41.02149403406685, 29.034365883896612], 5);
 
     L.tileLayer(
       "https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU",

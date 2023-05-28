@@ -4,6 +4,10 @@ import Navbar from "../components/Navbar";
 import logo from '../assets/MiniLogoGeoMemoirs.png';
 import { Link } from "react-router-dom";
 
+//http://localhost:8800/api
+//https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api
+
+
 function Home() {
     
 

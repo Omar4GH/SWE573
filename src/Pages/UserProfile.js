@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
-import Edit from "@mui/icons-material/Edit";
-import Delete from "@mui/icons-material/Delete";
+
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+
 import moment from "moment";
 
-import { useParams } from "react-router-dom";
-import { useContext } from "react";
+
 import "../scss/style.scss";
-import Navbar from "../components/Navbar";
+
 import NominatimGeocoder from "nominatim-geocoder";
-import { AuthContext } from "../context/authContext";
+
 
 import { Icon, divIcon, point } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import _axios from "../api/_axios";
 
 function UserProfile() {
   const location = useLocation();
@@ -37,8 +36,8 @@ function UserProfile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${userid}`
+        const res = await _axios.get(
+          `husers/${userid}`
         );
         setUser(res.data);
         // console.log(res.data);
@@ -55,8 +54,8 @@ function UserProfile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/user/${userid}`
+        const res = await _axios.get(
+          `story/user/${userid}`
         );
         setStories(res.data);
         // console.log(res.data);
@@ -106,7 +105,7 @@ function UserProfile() {
               scrollWheelZoom={true}
             >
               <TileLayer
-                attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors'
+                attribution='<a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a>  '
                 url="https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU"
               />
 
@@ -135,10 +134,13 @@ function UserProfile() {
           <></>
         )}
         <div className="flex ">
-          <img
-            className="w-60 h-48 object-cover shadow-2xl rounded-lg"
-            src={user.img}
-          />
+        {user.img ? (<img
+                className="w-60 h-48 object-cover shadow-2xl rounded-lg"
+                src={user.img}
+              />):(<img
+                className="w-60 h-48 object-cover shadow-2xl rounded-lg"
+                src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+              />)}
           &nbsp;&nbsp;&nbsp;
           <div>
             <p className="font-bold"> {user.username}</p>

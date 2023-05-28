@@ -9,10 +9,11 @@ import "../scss/style.scss";
 import Navbar from "../components/Navbar";
 import NominatimGeocoder from "nominatim-geocoder";
 import { AuthContext } from "../context/authContext";
-import DoneIcon from '@mui/icons-material/Done';
+import DoneIcon from "@mui/icons-material/Done";
 import { Icon, divIcon, point } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import _axios from "../api/_axios";
 
 function Profile() {
   const { currentUser } = useContext(AuthContext);
@@ -29,14 +30,14 @@ function Profile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/user/${currentUser.id}`
+        const res = await _axios.get(
+          `story/user/${currentUser.id}`
         );
         setStories(res.data);
         // console.log(res.data);
-        console.log("res.data");
+       // console.log("res.data");
 
-        console.log(res.data);
+      //  console.log(res.data);
       } catch (err) {
         console.log(err);
       }
@@ -47,12 +48,12 @@ function Profile() {
 
   const getUser = async () => {
     try {
-      const res = await axios.get(
-        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${currentUser.id}`
+      const res = await _axios.get(
+        `users/${currentUser.id}`
       );
       setUserInfo(res.data);
 
-      console.log(res.data);
+     // console.log(res.data);
     } catch (err) {
       console.log(err);
     }
@@ -63,19 +64,22 @@ function Profile() {
   };
 
   const deleteStory = (id) => {
-    axios.delete(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/${id}`).then((response) => {
-      setTrigger(!trigger);
-    });
+    _axios
+      .delete(
+        `story/${id}`
+      )
+      .then((response) => {
+        setTrigger(!trigger);
+      });
   };
 
   const position = "34.4462209063811, 35.83014616188998";
 
   const customIcon = new Icon({
-    iconUrl:
-    "https://cdn-icons-png.flaticon.com/512/4874/4874744.png",
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/4874/4874744.png",
 
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
   });
 
   const [countries, setCountries] = useState([]);
@@ -97,18 +101,23 @@ function Profile() {
   const [country, setCountry] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [profileImg, setProfileImg] = useState("");
-  console.log(profileImg);
+ // console.log(profileImg);
   const updateProfile = async (e) => {
     e.preventDefault();
 
     try {
-      await axios
-        .put(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/${currentUser.id}`, {
-          bio: bio || userInfo.bio,
-          birthdate: birthdate || new Date(userInfo.birthdate).toISOString().slice(0, 10),
-          img: profileImg || userInfo.img,
-          country: country || userInfo.country,
-        })
+      await _axios
+        .put(
+          `users/${currentUser.id}`,
+          {
+            bio: bio || userInfo.bio,
+            birthdate:
+              birthdate ||
+              new Date(userInfo.birthdate).toISOString().slice(0, 10),
+            img: profileImg || userInfo.img,
+            country: country || userInfo.country,
+          }
+        )
         .then((response) => {
           setTrigger(!trigger);
           switchEditMode();
@@ -138,16 +147,22 @@ function Profile() {
                 <div className="listTitles">Followers</div>
                 <div className="details">{userInfo.followers}</div>
               </div>
-              <div
-                className="float-right right-96 text-right text-xs absolute m-0  text-gray-700"
-                
-              >
-                <Edit fontSize="medium" className="cursor-pointer hover:text-blue-800" onClick={switchEditMode}/>
+              <div className="float-right right-96 text-right text-xs absolute m-0  text-gray-700">
+                <Edit
+                  fontSize="medium"
+                  className="cursor-pointer hover:text-blue-800"
+                  onClick={switchEditMode}
+                />
                 Back
-                <DoneIcon fontSize="medium" className="cursor-pointer hover:text-green-600" onClick={updateProfile}/>Save Changes
+                <DoneIcon
+                  fontSize="medium"
+                  className="cursor-pointer hover:text-green-600"
+                  onClick={updateProfile}
+                />
+                Save Changes
               </div>
             </div>
-            { Array.isArray(stories) ? (
+            {Array.isArray(stories) ? (
               <div className="">
                 <MapContainer
                   className="leaflet-container2"
@@ -156,7 +171,7 @@ function Profile() {
                   scrollWheelZoom={true}
                 >
                   <TileLayer
-                    attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors'
+                    attribution='<a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a>  '
                     url="https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU"
                   />
 
@@ -185,71 +200,80 @@ function Profile() {
               </div>
             ) : (
               <></>
-            ) }
-           <div className="flex">
-  <div className="w-60 h-48 mr-4 relative">
-    <img
-      className="w-full h-full object-cover shadow-2xl rounded-lg"
-      src={userInfo.img}
-      alt="Profile"
-    />
-    <div className="absolute bottom-0 right-0">
-      <input
-        type="text"
-        name="img"
-        placeholder="Enter image URL"
-        value={userInfo.img}
-        onChange={(e) => setProfileImg(e.target.value)}
-        className="block w-full px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-      />
-    </div>
-  </div>
-  <div className="flex-grow">
-    <div className="mb-4">
-      <p className="font-bold text-lg">{userInfo.username}</p>
-      <textarea
-        className="block w-fit px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-        placeholder={userInfo.bio}
-        name="plan"
-        required
-        defaultValue={userInfo.bio}
-        onChange={(e) => {
-          setBio(e.target.value);
-        }}
-        disabled={false} // set to false to enable input
-      />
-
-    </div>
-    <div className="text-base text-gray-700">
-      <select
-        name="country"
-        className="block w-fit px-3 py-2 mt-2 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-        onChange={handleChange}
-        defaultValue={userInfo.country}
-      >
-        <option value={currentUser.country}>
-          {currentUser.country}
-        </option>
-        {countries.map((countries) => (
-          <option key={countries} value={countries}>
-            {countries}
-          </option>
-        ))}
-      </select>
-      <div className="mt-2 flex items-center">
-        <span className="mr-2">Age:</span>
-        <input
-          type="date"
-          name="birthdate"
-          value={new Date(userInfo.birthdate).toISOString().slice(0, 10)}
-          onChange={(e) => setBirthdate(e.target.value)}
-          className="block w-fit px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-        />
-      </div>
-    </div>
-  </div>
-</div>
-{" "}
+            )}
+            <div className="flex">
+              <div className="w-60 h-48 mr-4 relative">
+                {userInfo.img ? (
+                  <img
+                    className="w-60 h-48 object-cover shadow-2xl rounded-lg"
+                    src={userInfo.img}
+                  />
+                ) : (
+                  <img
+                    className="w-60 h-48 object-cover shadow-2xl rounded-lg"
+                    src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+                  />
+                )}
+                <div className="absolute bottom-0 right-0">
+                  <input
+                    type="text"
+                    name="img"
+                    placeholder="Enter image URL"
+                    defaultValue={userInfo.img}
+                    onChange={(e) => setProfileImg(e.target.value)}
+                    className="block w-full px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="flex-grow">
+                <div className="mb-4">
+                  <p className="font-bold text-lg">{userInfo.username}</p>
+                  <textarea
+                    className="block w-fit px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                    placeholder={userInfo.bio}
+                    name="plan"
+                    required
+                    defaultValue={userInfo.bio}
+                    onChange={(e) => {
+                      setBio(e.target.value);
+                    }}
+                    disabled={false} // set to false to enable input
+                  />
+                </div>
+                <div className="text-base text-gray-700">
+                  <select
+                    name="country"
+                    className="block w-fit px-3 py-2 mt-2 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                    onChange={handleChange}
+                    defaultValue={userInfo.country}
+                  >
+                    {currentUser.country ? (<option value={currentUser.country}>
+                      {currentUser.country}
+                    </option>):(<option value="">
+                      Choose Country
+                    </option>)}
+                    
+                    {countries.map((countries) => (
+                      <option key={countries} value={countries}>
+                        {countries}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="mt-2 flex items-center">
+                    <span className="mr-2">Age:</span>
+                    <input
+                      type="date"
+                      name="birthdate"
+                      value={new Date(userInfo.birthdate)
+                        .toISOString()
+                        .slice(0, 10)}
+                      onChange={(e) => setBirthdate(e.target.value)}
+                      className="block w-fit px-3 py-2 text-sm text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>{" "}
           </div>
 
           <div className="usersList">
@@ -331,10 +355,17 @@ function Profile() {
               <></>
             )}
             <div className="flex ">
-              <img
-                className="w-60 h-48 object-cover shadow-2xl rounded-lg"
-                src={userInfo.img}
-              />
+              {userInfo.img ? (
+                <img
+                  className="w-60 h-48 object-cover shadow-2xl rounded-lg"
+                  src={userInfo.img}
+                />
+              ) : (
+                <img
+                  className="w-60 h-48 object-cover shadow-2xl rounded-lg"
+                  src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+                />
+              )}
               &nbsp;&nbsp;&nbsp;
               <div>
                 <p className="font-bold"> {userInfo.username}</p>
@@ -383,9 +414,11 @@ function Profile() {
                         <div className="details">Public</div>
                       </div>
                       <div>
-                <div className="details"><FavoriteIcon fontSize="small" className="mx-1" />
-                  {val.likes}</div>  
-              </div>
+                        <div className="details">
+                          <FavoriteIcon fontSize="small" className="mx-1" />
+                          {val.likes}
+                        </div>
+                      </div>
                       <div>
                         <div className="listTitles">Actions</div>
                         <div className="details">

@@ -62,180 +62,6 @@ padding: 10px;
     
  /*///////////////////////////////////////*/
 
-
-
-      footer {
-      margin-top: 150px;
-      padding: 20px;
-      background-color: #E8DED1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-   }
-
- 
-
-   /*           SINGLE POST           */
-
-      .single {
-      display: flex;
-      gap: 50px;
-      margin-left: 2px;
-      margin-right: 2px;
-   }
-      .single .content {
-      flex: 5;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-   }
-      .single .content img {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-   }
-      .single .content .user {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-   }
-      .single .content .user img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-   }
-      .single .content .user span {
-      font-weight: bold;
-   }
-      .single .content .edit {
-      display: flex;
-      gap: 5px;
-   }
-      .single .content .edit img {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-   }
-      .single .content h1 {
-      font-size: 42px;
-      color: #333;
-   }
-      .single .content p {
-      text-align: justify;
-      line-height: 30px;
-   }
-      .single .menu {
-      flex: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-   }
-      .single .menu h1 {
-      font-size: 20px;
-      color: #555;
-   }
-      .single .menu .post {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-   }
-      .single .menu .post img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-   }
-      .single .menu .post h2 {
-      color: #555;
-   }
-      .single .menu .post button {
-      width: max-content;
-      padding: 7.5px 15px;
-      border: none;
-      cursor: pointer;
-      color: teal;
-      background-color: white;
-      border: 1px solid teal;
-   }
-      .single .menu .post button:hover {
-      border: 1px solid white;
-      background-color: #b9e7e7;
-      color: black;
-   }
-      .add {
-      margin-top: 20px;
-      display: flex;
-      gap: 20px;
-   }
-      .add .content {
-      flex: 5;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-   }
-      .add .content input {
-      padding: 10px;
-      border: 1px solid lightgray;
-   }
-      .add .content .editorContainer {
-      height: 300px;
-      overflow: scroll;
-      border: 1px solid lightgray;
-   }
-      .add .content .editorContainer .editor {
-      height: 100%;
-      border: none;
-   }
-      .add .menu {
-      flex: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-   }
-      .add .menu .item {
-      border: 1px solid lightgray;
-      padding: 10px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #555;
-   }
-      .add .menu .item h1 {
-      font-size: 20px;
-   }
-      .add .menu .item .file {
-      text-decoration: underline;
-      
-   }
-      .add .menu .item .buttons {
-      display: flex;
-      justify-content: space-between;
-   }
-      .add .menu .item .buttons :first-child {
-      
-      color: teal;
-      background-color: white;
-      border: 1px solid teal;
-      padding: 3px 5px;
-   }
-      .add .menu .item .buttons :last-child {
-      
-      color: white;
-      background-color: teal;
-      border: 1px solid teal;
-      padding: 3px 5px;
-   }
-      .add .menu .item .cat {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      color: teal;
-   }
-
    /*/////////////////////////////*/
    .leaflet-container1 {
       width: 100%;
@@ -450,4 +276,133 @@ ol.comments-list>li {
  }
 
  /*//////////////////////////////*/
- 
+ button.MuiButton-root.date {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  color: inherit;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+  min-width: 64px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  -webkit-transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  color: #fff;
+  background-color: #1976d2;
+  box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
+}
+
+div.MuiChip-root {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  color: inherit;
+  max-width: 100%;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-size: 0.8125rem;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  height: 32px;
+  color: #fff;
+  background-color: #1976d2;
+  border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+div.MuiChip-root.feed-chip {
+  max-width: 100%;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.8125rem;
+  display: inline-flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  height: 24px;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  white-space: nowrap;
+  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  cursor: default;
+  outline: 0px;
+  text-decoration: none;
+  margin-right:1px ;
+  font-family: sans-serif;
+  border: 0px;
+  padding: 0px;
+  vertical-align: middle;
+  box-sizing: border-box;
+}

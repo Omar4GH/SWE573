@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Edit from "@mui/icons-material/Edit";
 import Delete from "@mui/icons-material/Delete";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import moment from "moment";
 import { useContext } from "react";
 import "../scss/style.scss";
 import Avatar from "@mui/material/Avatar";
 import Heart from "react-animated-heart";
 import { red } from "@mui/material/colors";
-import Navbar from "../components/Navbar";
+
 import NominatimGeocoder from "nominatim-geocoder";
 import { AuthContext } from "../context/authContext";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { Chip } from "@mui/material";
 import CardHeader from "@mui/material/CardHeader";
-import { Icon, divIcon, point } from "leaflet";
+import { Icon } from "leaflet";
+import _axios from "../api/_axios";
 
 function Story() {
   const [story, setStory] = useState({});
@@ -26,7 +27,7 @@ function Story() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [trigger, setTtrigger] = useState(false);
+  const [trigger, setTrigger] = useState(false);
 
   const geoConvert = new NominatimGeocoder();
 
@@ -39,9 +40,7 @@ function Story() {
   const [lat, setLat] = useState();
   const [lon, setLon] = useState();
 
-  
-
-  const [tags, setTags] = useState({});
+  const [tags, setTags] = useState([]);
   const [address, setAddress] = useState("");
   const storyId = location.pathname.split("/")[2];
   const { currentUser } = useContext(AuthContext);
@@ -49,18 +48,12 @@ function Story() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/${storyId}`
-        );
+        const res = await _axios.get(`story/${storyId}`);
         setStory(res.data);
-        setTags(res.data.tags.split(","));
-        console.log(res.data.tags);
-
+        setTags(JSON.parse(res.data.tags));
         const [latStr, lonStr] = res.data.geocode.split(",");
         setLat(parseFloat(latStr.trim()));
         setLon(parseFloat(lonStr.trim()));
-
-      
       } catch (err) {
         console.log(err);
       }
@@ -71,11 +64,9 @@ function Story() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/comments/${storyId}`
-        );
+        const res = await _axios.get(`comments/${storyId}`);
         setComments(res.data);
-        console.log(res.data);
+       // console.log(res.data);
       } catch (err) {
         console.log(err);
       }
@@ -97,14 +88,14 @@ function Story() {
         } else {
           setAddress(`${city}, ${country}`);
         }
-        console.log(`${city}, ${country}`);
+       // console.log(`${city}, ${country}`);
       });
     }
   }, [lat, lon]);
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/${storyId}`);
+      await _axios.delete(`story/${storyId}`);
       navigate("/");
     } catch (err) {
       console.log(err);
@@ -116,32 +107,31 @@ function Story() {
     // iconUrl: require(PlaceIcon),
     iconSize: [40, 40],
     iconAnchor: [20, 40],
-    
   });
   const secondaryIcon = new Icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/4874/4874669.png",
     // iconUrl: require(PlaceIcon),
     iconSize: [40, 40],
     iconAnchor: [20, 40],
-    
   });
   ////////////////////////////////  COMMENT   /////////////////////////////////////////////////
 
   const postCommentClick = async (e) => {
     e.preventDefault();
-    setTtrigger(!trigger);
+    
     // const imgUrl = await upload();
 
     try {
-      await axios
-        .post(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/comments/`, {
+      await _axios
+        .post(`comments/`, {
           date_posted: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
           comment: comment,
           sid: story.id,
           uid: currentUser.id,
         })
         .then((response) => {
-          console.log(response.data);
+         // console.log(response.data);
+         setTrigger(!trigger);
         });
     } catch (err) {
       console.log(err);
@@ -149,46 +139,42 @@ function Story() {
   };
 
   const deleteComment = async (id) => {
-    setTtrigger(!trigger);
+    
 
     try {
-      await axios
-        .delete(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/comments/${id}`)
-        .then((response) => {
-          console.log(response);
-        });
+      await _axios.delete(`comments/${id}`).then((response) => {
+      //  console.log(response);
+      setTrigger(!trigger);
+      });
     } catch (err) {
       console.log(err);
     }
   };
   /////////////////////////////////////////      Like       ////////////////////////////////////////////
 
-
   const postLike = async (e) => {
     e.preventDefault();
-    setTtrigger(!trigger);
+    setTrigger(!trigger);
 
     if (isClick) {
       try {
-        await axios
-          .delete(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/likes/${likeId}/${storyId}`)
-          .then((response) => {
-            console.log("deleted Comment");
-            setIsLiked(false);
-            setIsClick(false);
-          });
+        await _axios.delete(`likes/${likeId}/${storyId}`).then((response) => {
+         // console.log("deleted Comment");
+          setIsLiked(false);
+          setIsClick(false);
+        });
       } catch (err) {
         console.log(err);
       }
     } else {
       try {
-        await axios
-          .post(`https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/likes/`, {
+        await _axios
+          .post(`likes/`, {
             user_id: currentUser.id,
             story_id: story.id,
           })
           .then((response) => {
-            console.log(response.data);
+          //  console.log(response.data);
             setIsLiked(true);
             setIsClick(true);
           });
@@ -200,9 +186,9 @@ function Story() {
 
   const getLikes = async () => {
     try {
-      const res = await axios.get("https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/likes/");
+      const res = await _axios.get("likes/");
       setAllLikes(res.data);
-      console.log(res.data);
+     // console.log(res.data);
     } catch (err) {
       console.log(err);
     }
@@ -221,12 +207,12 @@ function Story() {
         );
         if (userLiked) {
           setIsClick(true);
-          console.log("liked by user");
+         // console.log("liked by user");
           const userlike = filteredLikes.filter(
             (like) => like.user_id === currentUser.id
           );
           setLikeId(userlike[0].id);
-          console.log(userlike[0].id);
+          //console.log(userlike[0].id);
         }
       }
     }
@@ -247,7 +233,6 @@ function Story() {
               src={story.userImg}
               aria-label="avatar"
             />
-
             <div className="info">
               <span>{story.username}</span>
               <p>Posted {moment(story.postdate).fromNow()}</p>
@@ -260,10 +245,39 @@ function Story() {
                 <Delete onClick={handleDelete} />
               </div>
             )}
-
             <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
               {address} &nbsp;&nbsp; {story.year}
             </div>
+            {story.fulldate && (
+              <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
+                <br /> <br />
+                {new Date(story.fulldate).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })}
+              </div>
+            )}
+            {story.enddate && (
+              <div className="float-right right-96 text-right text-base m-0 absolute text-gray-700">
+                <br /> <br /> <br /> <br />
+                From :{" "}
+                {new Date(story.startdate).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+                To :{" "}
+                {new Date(story.enddate).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+            )}
           </div>
           <div className="flex  justify-center ">
             {lat != null && lon != null && (
@@ -274,26 +288,35 @@ function Story() {
                 scrollWheelZoom={true}
               >
                 <TileLayer
-                  attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors"'
+                  attribution='<a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a>  '
                   url="https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU"
                 />
 
                 <Marker position={[lat, lon]} icon={customIcon}></Marker>
                 {story.geocode2 && (
-  <Marker position={story.geocode2.split(",")} icon={secondaryIcon}></Marker>
-)}
-         {story.geocode3 && (
-  <Marker position={story.geocode3.split(",")} icon={secondaryIcon}></Marker>
-)}
-
+                  <Marker
+                    position={story.geocode2.split(",")}
+                    icon={secondaryIcon}
+                  ></Marker>
+                )}
+                {story.geocode3 && (
+                  <Marker
+                    position={story.geocode3.split(",")}
+                    icon={secondaryIcon}
+                  ></Marker>
+                )}
               </MapContainer>
             )}
           </div>
           <h1>{story.title}</h1>
           <div>
             {Array.isArray(tags) && tags.length > 0 ? (
-              JSON.parse(tags).map((tag) => (
-                <Chip className="mx-1" key={tag} label={tag} />
+              tags.map((tag) => (
+                <Chip
+                  className="mx-1 feed-chip"
+                  key={tag.id}
+                  label={tag.label.toString()}
+                />
               ))
             ) : (
               <></>
@@ -309,16 +332,16 @@ function Story() {
       <div className="">
         <div className="float-right right-96 text-right align-center text-base m-0 absolute flex self-center text-gray-700">
           <div className="relative">
-          {currentUser ? (
+            {currentUser ? (
               <>
-    <Heart isClick={isClick} onClick={postLike} />
+                <Heart isClick={isClick} onClick={postLike} />
               </>
             ) : (
               <>
-            <Heart disabled className="cursor-not-allowed"  />
+                <Heart disabled className="cursor-not-allowed" />
               </>
             )}
-            
+
             <span className="absolute top-1/2 transform -translate-y-1/2 left-full ml-2">
               {story.likes}
             </span>
@@ -377,7 +400,7 @@ function Story() {
                   {currentUser &&
                     (currentUser.id === story.uid ||
                       comment.uid === currentUser.id) && (
-                        <div className="edit absolute top-0 right-0 mr-5 mt-2">
+                      <div className="edit absolute top-0 right-0 mr-5 mt-2">
                         <Delete
                           className="cursor-pointer hover:text-red-500"
                           onClick={() => deleteComment(comment.id)}

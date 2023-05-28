@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import _axios from "../api/_axios";
 
 export const AuthContext = createContext();
 
@@ -10,12 +11,12 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputs) => {
-    const res = await axios.post("https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/auth/login",inputs);
+    const res = await _axios.post("auth/login",inputs);
     setCurrentUser(res.data);
   };
 
   const logout = async (inputs) => {
-   await axios.post("https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/auth/logout");
+   await _axios.post("auth/logout");
     setCurrentUser(null);
   };
 
