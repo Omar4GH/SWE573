@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -16,6 +16,8 @@ import Avatar from "@mui/material/Avatar";
 import { red } from "@mui/material/colors";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -43,24 +45,34 @@ import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import PersonIcon from "@mui/icons-material/Person";
 import Tooltip from "@mui/material/Tooltip";
+import _axios from "../api/_axios";
+import SeasonSelection from "../components/SeasonSelection";
 
 function Feed() {
   const [stories, setStories] = useState([]);
   const [users, setUsers] = useState([]);
   //const yearFilter = useLocation().search;
   const [yearFilter, setYearFilter] = useState("");
+  const [beforeYear, setBeforeYear] = useState("");
+  const [afterYear, setAfterYear] = useState("");
   const [titleFilter, setTitleFilter] = useState("");
   const [tagsFilter, setTagsFilter] = useState("");
   const [userFilter, setUserFilter] = useState("");
   const [usernameFilter, setUsernameFilter] = useState("");
+  const [selectedYearBA, setSelectedYearBA] = useState(null);
+  const [selectedMonths, setSelectedMonths] = useState([
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+  ]);
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-
+  const [countries, setCountries] = useState([]);
+  const [alignment, setAlignment] = useState("before");
   const [showMore, setShowMore] = useState({});
   const [mapExpanded, setMapExpanded] = useState(true);
 
   const handleMapExpand = () => {
     setMapExpanded(!mapExpanded);
-    console.log(mapExpanded);
+   // console.log(mapExpanded);
   };
   const handleShowMore = (storyId) => {
     setShowMore((prevState) => ({
@@ -99,22 +111,20 @@ function Feed() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(
-        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/story/?year=${yearFilter}&tags=${tagsFilter}&title=${titleFilter}&userid=${userFilter}`
+      const res = await _axios.get(
+        `story/?year=${yearFilter}&tags=${tagsFilter}&title=${titleFilter}&userid=${userFilter}&beforeyear=${beforeYear}&afteryear=${afterYear}&selectedMonths=${selectedMonths}&selectedCountry=${selectedCountry}`
       );
       setStories(res.data);
-      console.log(res);
+      //console.log(res);
     } catch (err) {
       console.log(err);
     }
   };
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(
-        `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/api/users/?name=${usernameFilter}`
-      );
+      const res = await _axios.get(`users/?name=${usernameFilter}`);
       setUsers(res.data);
-      console.log(res);
+      //console.log(res);
     } catch (err) {
       console.log(err);
     }
@@ -123,7 +133,18 @@ function Feed() {
   useEffect(() => {
     fetchData();
     fetchUsers();
-  }, [yearFilter, titleFilter, userFilter, usernameFilter, tagsFilter]);
+  }, [
+    yearFilter,
+    titleFilter,
+    userFilter,
+    usernameFilter,
+    tagsFilter,
+    beforeYear,
+    afterYear,
+    alignment,
+    selectedMonths,
+    selectedCountry,
+  ]);
 
   //Side Menu
 
@@ -145,13 +166,65 @@ function Feed() {
 
   //////////////
   const handleCopy = (storyid) => {
-    const url = `https://geomemoirs-backend-sh52mcq4ba-oa.a.run.app/story/${storyid}`;
+    const url = `https://geo-memoirs.netlify.app/${storyid}`;
     navigator.clipboard.writeText(url);
+  };
+  /////////////////////////////////////
+  const handleChange = (event, newAlignment) => {
+    setAlignment(newAlignment);
+  };
+  useEffect(() => {
+    if (alignment == "before") {
+      setBeforeYear(selectedYearBA);
+      setAfterYear("");
+    }
+    if (alignment == "after") {
+      setAfterYear(selectedYearBA);
+      setBeforeYear("");
+    }
+  }, [alignment]);
+
+  const handleYearBAChange = (date) => {
+    if (alignment == "before") {
+      setBeforeYear(date);
+      setSelectedYearBA(date);
+      setAfterYear("");
+    }
+    if (alignment == "after") {
+      setAfterYear(date);
+      setSelectedYearBA(date);
+      setBeforeYear("");
+    }
+  };
+  const handleClearYearBA = () => {
+    setBeforeYear("");
+    setAfterYear("");
+    setSelectedYearBA("");
+  };
+  /////////////////////////////////////////////////
+  const handleMonthsFilter = (selectedMonths) => {
+    // Implement your logic to send the selected months to the backend
+    //console.log(selectedMonths);
+    setSelectedMonths(selectedMonths);
+    // Make a request to your backend API and pass the selected months
+  };
+  //////////////////////////////////////////////////////////
+
+  useEffect(() => {
+    fetch("https://restcountries.com/v2/all")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountries(data.map((country) => country.name));
+      });
+  }, []);
+
+  const handleCountryChange = (event, value) => {
+    setSelectedCountry(value || ""); // Set the selected country value or an empty string if no country is selected
   };
 
   return (
     <div className="home">
-      <h1 className="mt-7 mb-1 text-center text-5xl">
+      <h1 className="mt-7 mb-1 text-center sm:text-base md:text-5xl">
         Check out Stories from around the World !{" "}
       </h1>
 
@@ -242,6 +315,58 @@ function Feed() {
                   </button>
                 )}
               </div>
+
+              <div className="relative mb-5 mr-4" style={{ zIndex: 9999 }}>
+                <DatePicker
+                  selected={selectedYearBA}
+                  onChange={(date) => handleYearBAChange(date.getFullYear())}
+                  dateFormat="yyyy"
+                  showYearPicker
+                  className="pl-8 pr-3 py-2 w-72 border rounded-md"
+                  placeholderText="< or > a year"
+                  value={selectedYearBA ? selectedYearBA.toString() : ""}
+                >
+                  <div className="text-center">
+                    <ToggleButtonGroup
+                      color="primary"
+                      value={alignment}
+                      exclusive
+                      onChange={handleChange}
+                      aria-label="Platform"
+                      className="bg-white"
+                      size="small"
+                    >
+                      <ToggleButton value="before">Before</ToggleButton>
+                      <ToggleButton value="after">After</ToggleButton>
+                    </ToggleButtonGroup>
+                  </div>
+                </DatePicker>
+                <CalendarIcon className="w-4 h-4 absolute top-3 left-2 text-gray-400" />
+                {selectedYearBA && (
+                  <button
+                    className="absolute top-3 right-2 text-gray-400"
+                    onClick={handleClearYearBA}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div>
+                <SeasonSelection handleFilter={handleMonthsFilter} />
+              </div>
+
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                options={countries}
+                sx={{ width: 250 }}
+                className="bg-white"
+                value={selectedCountry}
+                onChange={handleCountryChange}
+                renderInput={(params) => (
+                  <TextField {...params} label="Countries" />
+                )}
+              />
             </div>
           </AccordionDetails>
         </Accordion>
@@ -274,7 +399,7 @@ function Feed() {
           )}
 
           <TileLayer
-            attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors"'
+            attribution='<a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a>  '
             url="https://{s}.tile.jawg.io/5a646c26-4702-40b1-8fed-671eacbf1892/{z}/{x}/{y}{r}.png?access-token=Jsz7VZAnkb84aX0p5Oq8HwK57Vu4YmeRlNf1t7TUaujVsv3eOgqX8IWMoeUQ5DRU"
           />
           <MarkerClusterGroup chunkedLoading>
@@ -291,9 +416,10 @@ function Feed() {
                   })
                 }
               >
-                <Popup >
+                <Popup>
                   <Link to={`/story/${story.id}`}>
-                    <div className="w-56"
+                    <div
+                      className="w-56"
                       sx={{
                         maxWidth: 350,
                         width: "100%",
@@ -413,9 +539,9 @@ function Feed() {
                       .slice(0, 6)
                       .map((tag, index) => (
                         <Chip
-                          className="w-fit"
+                          className="w-fit feed-chip"
                           key={tag}
-                          label={tag}
+                          label={tag.label}
                           size="small"
                         />
                       ))}
@@ -435,9 +561,9 @@ function Feed() {
                         .slice(6)
                         .map((tag, index) => (
                           <Chip
-                            className="w-fit"
+                            className="w-fit feed-chip"
                             key={tag}
-                            label={tag}
+                            label={tag.label}
                             size="small"
                           />
                         ))}
