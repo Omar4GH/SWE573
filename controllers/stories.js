@@ -41,7 +41,7 @@ export const getStories = (req, res) => {
     }
     if (req.query.selectedMonths && req.query.selectedMonths.length > 0) {
       const selectedMonthsArray = req.query.selectedMonths.split(",");
-      console.log(selectedMonthsArray);
+     // console.log(selectedMonthsArray);
       params.push(selectedMonthsArray);
     }
     if (req.query.selectedCountry) {
